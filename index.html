@@ -1,3 +1,9 @@
+<!-- PASS 159: GACHA POPUP GRID + RAINBOW SECRET
+- ลดขนาดปุ่มรับทราบและจัดกึ่งกลาง
+- จัดเนื้อหา Popup เป็นกริด ลดข้อความและแท็กเบียดกัน
+- แท็ก EYA-01 จัดเป็น 2 คอลัมน์
+- เปลี่ยนเอฟเฟกต์ SECRET UNIT จากสีทองเป็นสีรุ้ง
+-->
 <!-- PASS 158: ลดขนาด Popup กาชาลงประมาณ 20% -->
 <!-- PASS 157: เพิ่ม selector ของ Popup จริงที่พบในไฟล์ -->
 <!-- PASS 156: CENTER ALL POPUPS
@@ -4012,6 +4018,189 @@ section.page.cmd.command-locked .actions{
 .financial-warning-popup{
   align-self:center !important;
   justify-self:center !important;
+}
+
+
+/* ===== PASS 159 : GACHA POPUP GRID + RAINBOW SECRET ===== */
+
+.v2-gacha-popup-content{
+  display:grid !important;
+  grid-template-rows:auto auto auto auto auto;
+  justify-items:center;
+  align-content:start;
+  row-gap:7px;
+}
+
+.v2-gacha-popup-kicker{
+  margin:0 !important;
+  line-height:1.2;
+}
+
+.v2-gacha-popup-art{
+  margin-top:4px !important;
+}
+
+.v2-gacha-popup-name{
+  margin-top:2px !important;
+  line-height:1.15 !important;
+  text-align:center;
+  word-break:break-word;
+}
+
+.v2-gacha-popup-desc{
+  margin-top:0 !important;
+  min-height:0 !important;
+  max-width:92%;
+  font-size:9px !important;
+  line-height:1.4 !important;
+  text-align:center;
+}
+
+.v2-gacha-popup-tags{
+  display:grid !important;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:5px !important;
+  width:100%;
+  margin-top:0 !important;
+}
+
+.v2-gacha-popup-tags i{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:24px;
+  padding:4px 5px !important;
+  font-size:7px !important;
+  line-height:1.2;
+  text-align:center;
+  white-space:normal;
+}
+
+.v2-gacha-popup-close{
+  width:auto !important;
+  min-width:112px;
+  min-height:34px !important;
+  height:34px;
+  margin-top:4px !important;
+  padding:0 16px !important;
+  border-radius:9px !important;
+  font-size:11px !important;
+  justify-self:center;
+}
+
+/* EYA-01 rainbow secret treatment */
+.v2-gacha-popup.secret{
+  border-color:transparent !important;
+  background:
+    linear-gradient(#10263a,#07111c) padding-box,
+    conic-gradient(
+      from 0deg,
+      #ff4d6d,
+      #ff9f43,
+      #ffe66d,
+      #6bff95,
+      #52d6ff,
+      #7c6cff,
+      #d96cff,
+      #ff4d6d
+    ) border-box !important;
+  border:2px solid transparent !important;
+  box-shadow:
+    0 28px 90px rgba(0,0,0,.72),
+    0 0 34px rgba(82,214,255,.25),
+    0 0 28px rgba(217,108,255,.20) !important;
+}
+
+.v2-gacha-popup.secret .v2-gacha-light{
+  background:linear-gradient(
+    90deg,
+    transparent,
+    rgba(255,77,109,.38),
+    rgba(255,230,109,.42),
+    rgba(82,214,255,.42),
+    rgba(217,108,255,.38),
+    transparent
+  ) !important;
+}
+
+.v2-gacha-popup.secret .v2-gacha-flare{
+  background:white !important;
+  box-shadow:
+    0 0 22px 9px rgba(255,77,109,.55),
+    0 0 34px 14px rgba(255,230,109,.42),
+    0 0 48px 20px rgba(82,214,255,.38),
+    0 0 66px 26px rgba(217,108,255,.30) !important;
+}
+
+.v2-gacha-secret-banner{
+  color:#fff !important;
+  background:
+    linear-gradient(rgba(3,8,14,.78),rgba(3,8,14,.78)),
+    linear-gradient(
+      90deg,
+      #ff4d6d,
+      #ff9f43,
+      #ffe66d,
+      #6bff95,
+      #52d6ff,
+      #7c6cff,
+      #d96cff
+    ) !important;
+  text-shadow:
+    0 0 8px rgba(255,255,255,.95),
+    0 0 18px rgba(82,214,255,.75),
+    0 0 28px rgba(217,108,255,.55) !important;
+}
+
+.v2-gacha-popup.secret .v2-gacha-popup-kicker,
+.v2-gacha-popup.secret .v2-gacha-popup-name{
+  background:linear-gradient(
+    90deg,
+    #ff5d7a,
+    #ffb14a,
+    #ffe66d,
+    #6bff95,
+    #52d6ff,
+    #8b7cff,
+    #e178ff
+  );
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent !important;
+}
+
+.v2-gacha-popup.secret .v2-gacha-popup-art{
+  border-color:rgba(255,255,255,.28) !important;
+  background:
+    radial-gradient(circle at 50% 45%,rgba(255,255,255,.18),transparent 42%),
+    linear-gradient(rgba(82,214,255,.06) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(217,108,255,.06) 1px,transparent 1px),
+    rgba(2,10,17,.74) !important;
+  background-size:auto,12px 12px,12px 12px,auto !important;
+}
+
+.v2-gacha-popup.secret .v2-gacha-popup-art .mech{
+  filter:
+    drop-shadow(0 0 8px rgba(255,77,109,.38))
+    drop-shadow(0 0 12px rgba(82,214,255,.34))
+    drop-shadow(0 0 16px rgba(217,108,255,.28)) !important;
+}
+
+@media(max-height:700px){
+  .v2-gacha-popup-content{
+    row-gap:5px;
+  }
+
+  .v2-gacha-popup-tags i{
+    min-height:21px;
+    font-size:6.5px !important;
+  }
+
+  .v2-gacha-popup-close{
+    min-height:31px !important;
+    height:31px;
+    font-size:10px !important;
+  }
 }
 
 </style>
