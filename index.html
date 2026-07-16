@@ -1,3 +1,24 @@
+<!-- PASS 158: ลดขนาด Popup กาชาลงประมาณ 20% -->
+<!-- PASS 157: เพิ่ม selector ของ Popup จริงที่พบในไฟล์ -->
+<!-- PASS 156: CENTER ALL POPUPS
+- Popup ทุกระบบยึดกับ viewport ด้วย position:fixed
+- จัดกึ่งกลางแนวตั้งและแนวนอน ไม่ขึ้นกับตำแหน่ง scroll
+- รองรับ 100dvh และ fallback 100vh
+- จำกัดความสูง Popup ให้ไม่ล้นจอ และเลื่อนภายใน Popup แทน
+-->
+<!-- PASS 155: ปรับ Typography และช่องไฟของ Popup ให้สบายตาขึ้น -->
+<!-- PASS 154: TRUE 3x2 BASE POPUP
+- แก้กฎหลักโดยตรง ไม่พึ่ง media query 480px
+- สาเหตุเดิม: viewport ที่ใช้งานกว้างกว่า 480px จึงไม่เข้าเงื่อนไข
+- ดาวแสดง 3 คอลัมน์ × 2 แถวทุกหน้าจอ
+- ลดความสูง ข้อความ ช่องไฟ และขนาดส่วนบนจริง
+-->
+<!-- PASS 152: MOBILE BASE POPUP 3x2
+- มือถือแสดงดาว 3 คอลัมน์ × 2 แถว เพื่อลดความสูง
+- ไม่เพิ่มความกว้าง Popup
+- ลดตัวอักษรและช่องไฟภายในทั้งหมด
+- คงดาวครบ 6 ดวงและสถานะโรงงานเดิม
+-->
 <!-- PASS 150: RESULT INVENTORY ALIGNMENT FIX
 - จัดบล็อกสินค้าคงเหลือเป็นแนวตั้งชิดซ้ายใต้ขายทั้งหมด
 - ป้องกันตัวเลขและสถานะไปติดขอบขวา
@@ -857,7 +878,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
   justify-content:center;
 }
 .base-choice-title{
-  font-size:24px;
+  font-size:19px;
   color:#ffd76c;
   text-align:center;
   font-weight:800;
@@ -930,7 +951,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
 .base-choice-planets{
   padding:0 10px 10px;
   display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
+  grid-template-columns:repeat(3,minmax(0,1fr));
   gap:8px;
 }
 .base-choice-planet{
@@ -1014,7 +1035,79 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
   .base-choice-unlock{padding:18px;gap:14px}
   .base-choice-holo{width:94px;height:94px;flex-basis:94px}
   .base-choice-title{font-size:21px}
-  .base-choice-planets{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .base-choice-planets{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+
+
+
+/* ===== PASS 151 : MOBILE BASE POPUP COMPACT ===== */
+@media (max-width: 480px){
+
+  .base-choice-backdrop{
+    padding:8px;
+  }
+
+  .base-choice-card{
+    width:min(340px,96vw) !important;
+    max-height:92vh;
+  }
+
+  .base-choice-unlock{
+    padding:12px !important;
+    gap:10px;
+  }
+
+  .base-choice-holo{
+    width:72px !important;
+    height:72px !important;
+    flex:0 0 72px !important;
+  }
+
+  .base-choice-desc h3{
+    font-size:15px !important;
+  }
+
+  .base-choice-desc p{
+    font-size:11px !important;
+    line-height:1.35;
+  }
+
+  .base-choice-notice{
+    margin-top:8px;
+    padding:6px 8px;
+    font-size:11px;
+  }
+
+  .base-choice-required{
+    padding:0 10px 10px;
+    font-size:11px;
+  }
+
+  .base-choice-planets{
+    padding:0 10px 10px !important;
+    gap:6px !important;
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  }
+
+  .base-choice-planet{
+    min-height:78px !important;
+    padding:8px;
+  }
+
+  .base-choice-planet-art{
+    width:64px !important;
+    height:64px !important;
+    margin-bottom:4px;
+  }
+
+  .base-choice-name{
+    font-size:11px;
+  }
+
+  .base-choice-cost,
+  .base-choice-status{
+    font-size:9px !important;
+  }
 }
 
 
@@ -3533,6 +3626,392 @@ section.page.cmd.command-locked .actions{
 
 .base-choice-planet:hover:not(:disabled) .loc-pixel-planet.colony7{
   transform:scale(1.08);
+}
+
+
+/* ===== PASS 152 : MOBILE BASE POPUP 3×2 LOW HEIGHT ===== */
+@media (max-width:480px){
+  .base-choice-backdrop{
+    padding:6px;
+  }
+
+  .base-choice-card{
+    width:min(340px,96vw) !important;
+    max-height:96vh;
+  }
+
+  .base-choice-unlock{
+    padding:9px 10px !important;
+    gap:8px !important;
+  }
+
+  .base-choice-holo{
+    width:62px !important;
+    height:62px !important;
+    flex:0 0 62px !important;
+    border-radius:15px;
+  }
+
+  .base-choice-holo::before{
+    inset:13px;
+  }
+
+  .base-choice-holo::after{
+    font-size:30px;
+  }
+
+  .base-choice-desc h3{
+    margin-bottom:4px !important;
+    font-size:12px !important;
+    line-height:1.2;
+  }
+
+  .base-choice-desc p{
+    font-size:8.5px !important;
+    line-height:1.25 !important;
+  }
+
+  .base-choice-notice{
+    margin-top:5px !important;
+    padding:4px 6px !important;
+    border-radius:8px;
+    font-size:8.5px !important;
+    line-height:1.2;
+  }
+
+  .base-choice-required{
+    padding:0 8px 6px !important;
+    font-size:9px !important;
+    line-height:1.2;
+  }
+
+  .base-choice-planets{
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+    gap:5px !important;
+    padding:0 8px 8px !important;
+  }
+
+  .base-choice-planet{
+    min-height:91px !important;
+    padding:5px 3px !important;
+    border-radius:11px;
+  }
+
+  .base-choice-planet-art{
+    width:54px !important;
+    height:54px !important;
+    margin-bottom:2px !important;
+    border-radius:12px;
+  }
+
+  .base-choice-planet-art .loc-pixel-planet{
+    transform:scale(.84);
+  }
+
+  .base-choice-planet:hover:not(:disabled) .loc-pixel-planet{
+    transform:scale(.88);
+  }
+
+  .base-choice-planet-art .loc-pixel-planet.colony7{
+    transform:scale(.88);
+  }
+
+  .base-choice-name{
+    max-width:100%;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    font-size:8.5px !important;
+    line-height:1.15;
+  }
+
+  .base-choice-cost{
+    margin-top:2px !important;
+    font-size:7px !important;
+    line-height:1.1;
+  }
+
+  .base-choice-status{
+    margin-top:2px !important;
+    font-size:7px !important;
+    line-height:1.1;
+  }
+}
+
+
+
+/* ===== PASS 153 : FIX MOBILE BASE POPUP ===== */
+@media (max-width: 480px){
+
+  /* เปลี่ยนกลับเป็น 3 คอลัมน์ 2 แถวจริง */
+  .base-choice-planets{
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+    gap:5px !important;
+    padding:0 8px 8px !important;
+  }
+
+  .base-choice-card{
+    width:min(340px,96vw) !important;
+    max-height:92vh !important;
+  }
+
+  .base-choice-unlock{
+    padding:10px !important;
+    gap:8px !important;
+  }
+
+  .base-choice-holo{
+    width:62px !important;
+    height:62px !important;
+    flex:0 0 62px !important;
+  }
+
+  .base-choice-holo::before{
+    inset:14px !important;
+  }
+
+  .base-choice-holo::after{
+    font-size:28px !important;
+  }
+
+  .base-choice-desc h3{
+    font-size:12px !important;
+    margin-bottom:4px !important;
+  }
+
+  .base-choice-desc p{
+    font-size:9px !important;
+    line-height:1.25 !important;
+  }
+
+  .base-choice-notice{
+    font-size:9px !important;
+    padding:5px 7px !important;
+    margin-top:6px !important;
+  }
+
+  .base-choice-required{
+    font-size:9px !important;
+    padding:0 8px 8px !important;
+  }
+
+  .base-choice-planet{
+    min-height:88px !important;
+    padding:6px 4px !important;
+    border-radius:12px !important;
+  }
+
+  .base-choice-planet-art{
+    width:52px !important;
+    height:52px !important;
+    margin-bottom:2px !important;
+  }
+
+  .base-choice-planet-art .loc-pixel-planet{
+    transform:scale(0.85) !important;
+  }
+
+  .base-choice-name{
+    font-size:8px !important;
+    line-height:1.1 !important;
+  }
+
+  .base-choice-cost,
+  .base-choice-status{
+    font-size:7px !important;
+    line-height:1.1 !important;
+  }
+}
+
+
+
+/* ===== PASS 154 : TRUE 3×2 BASE POPUP, NO VIEWPORT DEPENDENCY ===== */
+.base-choice-backdrop{
+  padding:6px !important;
+}
+.base-choice-card{
+  width:min(340px,96vw) !important;
+  max-height:96vh !important;
+}
+.base-choice-unlock{
+  padding:9px 10px !important;
+  gap:8px !important;
+}
+.base-choice-holo{
+  width:62px !important;
+  height:62px !important;
+  flex:0 0 62px !important;
+  border-radius:15px !important;
+}
+.base-choice-holo::before{
+  inset:13px !important;
+}
+.base-choice-holo::after{
+  font-size:30px !important;
+}
+.base-choice-desc h3{
+  margin-bottom:6px !important;
+  font-size:12px !important;
+  line-height:1.2 !important;
+}
+.base-choice-desc p{
+  font-size:8.5px !important;
+  line-height:1.42 !important;
+}
+.base-choice-notice{
+  margin-top:5px !important;
+  padding:4px 6px !important;
+  border-radius:8px !important;
+  font-size:8.5px !important;
+  line-height:1.38 !important;
+}
+.base-choice-required{
+  padding:2px 8px 8px !important;
+  font-size:9px !important;
+  line-height:1.35 !important;
+}
+.base-choice-planets{
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  gap:5px !important;
+  padding:0 8px 8px !important;
+}
+.base-choice-planet{
+  min-height:91px !important;
+  padding:5px 3px !important;
+  border-radius:11px !important;
+}
+.base-choice-planet-art{
+  width:54px !important;
+  height:54px !important;
+  margin-bottom:2px !important;
+  border-radius:12px !important;
+}
+.base-choice-planet-art .loc-pixel-planet{
+  transform:scale(.84) !important;
+}
+.base-choice-planet-art .loc-pixel-planet.colony7{
+  transform:scale(.88) !important;
+}
+.base-choice-name{
+  max-width:100% !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+  white-space:nowrap !important;
+  font-size:8.5px !important;
+  line-height:1.3 !important;
+}
+.base-choice-cost,
+.base-choice-status{
+  margin-top:2px !important;
+  font-size:7px !important;
+  line-height:1.1 !important;
+}
+
+
+/* ===== PASS 156 : CENTER ALL POPUPS IN VIEWPORT ===== */
+
+/* Shared rule for every overlay/backdrop system in this game */
+.v2-modal-backdrop,
+.v2-gacha-popup-backdrop,
+.base-choice-backdrop,
+.base-popup-backdrop,
+.popup-backdrop,
+.bankruptcy-overlay,
+.bankrupt-overlay,
+.financial-warning-overlay,
+.pilot-popup-backdrop,
+.pilot-modal-backdrop,
+.gacha-popup-backdrop{
+  position:fixed !important;
+  inset:0 !important;
+  width:100vw !important;
+  height:100vh !important;
+  height:100dvh !important;
+  margin:0 !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  overflow:hidden !important;
+  z-index:9999 !important;
+  transform:none !important;
+}
+
+/* Prevent popup panels from inheriting page scroll offsets */
+.v2-modal,
+.v2-gacha-popup,
+.base-choice-card,
+.base-popup-card,
+.popup-card,
+.bankruptcy-screen,
+.bankrupt-card,
+.financial-warning-card,
+.pilot-popup,
+.pilot-modal,
+.gacha-popup{
+  position:relative !important;
+  top:auto !important;
+  right:auto !important;
+  bottom:auto !important;
+  left:auto !important;
+  margin:auto !important;
+  transform-origin:center center !important;
+  max-height:calc(100dvh - 16px) !important;
+  overflow:auto !important;
+  -webkit-overflow-scrolling:touch;
+}
+
+/* iOS fallback */
+@supports not (height:100dvh){
+  .v2-modal-backdrop,
+  .v2-gacha-popup-backdrop,
+  .base-choice-backdrop,
+  .base-popup-backdrop,
+  .popup-backdrop,
+  .bankruptcy-overlay,
+  .bankrupt-overlay,
+  .financial-warning-overlay,
+  .pilot-popup-backdrop,
+  .pilot-modal-backdrop,
+  .gacha-popup-backdrop{
+    height:100vh !important;
+  }
+}
+
+
+/* ===== PASS 157 : COMPLETE POPUP CENTERING FOR ACTUAL CLASSES ===== */
+.v2-modal-layer{
+  position:fixed !important;
+  inset:0 !important;
+  width:100vw !important;
+  height:100vh !important;
+  height:100dvh !important;
+  margin:0 !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  overflow:hidden !important;
+  z-index:9999 !important;
+}
+
+.v2-modal-box,
+.pilot-decision-modal,
+.financial-warning-popup{
+  position:relative !important;
+  top:auto !important;
+  right:auto !important;
+  bottom:auto !important;
+  left:auto !important;
+  margin:auto !important;
+  max-height:calc(100dvh - 16px) !important;
+  overflow:auto !important;
+  -webkit-overflow-scrolling:touch;
+}
+
+/* In case these popup panels are rendered directly without a dedicated overlay */
+.pilot-decision-modal,
+.financial-warning-popup{
+  align-self:center !important;
+  justify-self:center !important;
 }
 
 </style>
@@ -9123,8 +9602,8 @@ v2style.textContent=`
 
 .v2-gacha-popup{
   position:relative;
-  width:min(360px,94vw);
-  min-height:430px;
+  width:min(288px,75vw);
+  min-height:344px;
   overflow:hidden;
   border-radius:24px;
   border:1px solid rgba(95,195,255,.48);
@@ -9216,7 +9695,7 @@ v2style.textContent=`
 .v2-gacha-popup-content{
   position:relative;
   z-index:4;
-  min-height:430px;
+  min-height:344px;
   padding:26px 22px 20px;
   display:flex;
   flex-direction:column;
@@ -9239,8 +9718,8 @@ v2style.textContent=`
 .v2-gacha-popup.secret .v2-gacha-popup-kicker{color:var(--gold)}
 
 .v2-gacha-popup-art{
-  width:190px;
-  height:190px;
+  width:152px;
+  height:152px;
   margin-top:14px;
   display:grid;
   place-items:center;
@@ -9265,8 +9744,8 @@ v2style.textContent=`
 }
 
 .v2-gacha-popup-art .mech{
-  width:150px;
-  height:150px;
+  width:120px;
+  height:120px;
   image-rendering:pixelated;
   filter:drop-shadow(0 0 12px rgba(95,195,255,.42));
   animation:v2GachaUnitFloat 2.2s ease-in-out infinite;
@@ -9277,7 +9756,7 @@ v2style.textContent=`
 
 .v2-gacha-popup-name{
   margin-top:14px;
-  font-size:24px;
+  font-size:19px;
   font-weight:1000;
   color:var(--gold);
   line-height:1;
@@ -9351,11 +9830,11 @@ v2style.textContent=`
 }
 
 @media(max-height:700px){
-  .v2-gacha-popup{min-height:390px}
-  .v2-gacha-popup-content{min-height:390px;padding:20px 18px 16px}
-  .v2-gacha-popup-art{width:160px;height:160px}
-  .v2-gacha-popup-art .mech{width:126px;height:126px}
-  .v2-gacha-popup-name{font-size:21px}
+  .v2-gacha-popup{min-height:312px}
+  .v2-gacha-popup-content{min-height:312px;padding:16px 14px 12px}
+  .v2-gacha-popup-art{width:128px;height:128px}
+  .v2-gacha-popup-art .mech{width:100px;height:100px}
+  .v2-gacha-popup-name{font-size:17px}
 }
 
 
