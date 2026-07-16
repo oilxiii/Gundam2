@@ -1,3 +1,95 @@
+<!-- PASS 150: RESULT INVENTORY ALIGNMENT FIX
+- จัดบล็อกสินค้าคงเหลือเป็นแนวตั้งชิดซ้ายใต้ขายทั้งหมด
+- ป้องกันตัวเลขและสถานะไปติดขอบขวา
+-->
+<!-- PASS 149: RESULT INVENTORY GRID
+- ย้ายสินค้าคงเหลือไปอยู่ใต้ยอดขายทั้งหมดฝั่งขวา
+- ปรับหัวสรุป Result เป็นกริด 2 คอลัมน์
+- จัดสถานะขายหมด/มีของค้างให้อยู่ในบล็อกเดียวกัน
+-->
+<!-- PASS 148: GACHA RESULT POPUP
+- ผลกาชาแสดงเป็น Popup กลางจอแทนด้านล่าง
+- เพิ่มลำแสงและแฟลชเปิดตัว
+- EYA-01 แสดง SECRET UNIT ก่อน แล้วค่อยเผยตัวหุ่น
+- เพิ่มปุ่มรับทราบเพื่อปิด Popup
+-->
+<!-- PASS 147: ลดขนาด Popup ลงอีกประมาณ 10% -->
+<!-- PASS 146: COLONY 7 CENTER FIX
+- ลบกฎ PASS 145 ที่ทำให้โคโลนี่ 7 เบี้ยว
+- จัดกึ่งกลางด้วย flex ที่กรอบรูป
+- ใช้ scale เฉพาะโคโลนี่ 7 โดยไม่ translate
+-->
+<!-- PASS 142: balance popup proportions -->
+<!-- ลดขนาดกรอบโดยรวม แต่เพิ่มขนาดดาวเล็กน้อย -->
+<!-- PASS 141: FORCE BASE POPUP 2x3
+- แก้กฎหลัก .base-choice-planets เป็น 2 คอลัมน์
+- แสดง 2×3 ทั้งมือถือและเดสก์ท็อป
+- ลดความกว้าง Popup และความสูงการ์ดเล็กน้อย
+-->
+<!-- PASS 139: BASE POPUP EXACT APPROVED DESIGN
+- ใช้โครงสร้างตาม base_unlock_popup_v9_existing_bases
+- มี Hologram, คำอธิบาย, Notice และ Grid 6 ดาวตามต้นแบบ
+- รูปดาวและค่าขนส่งดึงจากข้อมูลจริงของเกม
+- ดาวบ้านเกิด/มีโรงงาน/กำลังก่อสร้างเป็นสีเหลืองและกดไม่ได้
+- ไม่มีปุ่มปิด ต้องเลือกดาวที่ว่าง
+-->
+<!-- PASS 134: FIX CONFIRMED BUGS 1-6
+- Demand Priority: <50=0, 50-74=+1, 75-89=+2, 90+=+3
+- Planet Event Priority เพิ่มจากค่าต้นฉบับอีก +1 จริงทุกจุด
+- เงินหน้า Bankruptcy เป็นเงินหลังหักดอกเบี้ย
+- ผู้เล่นล้มละลายถูก mark eliminated และหยุดเข้าตลาด
+- ปุ่มดูผลการแข่งขันต่อจำลอง AI ต่อจนจบ Q12
+- Final Ranking ใช้ frozenScore ณ รอบที่ล้มละลาย
+-->
+<!-- PASS 133: BANKRUPTCY BUTTON SCOPE FIX
+- ย้ายฟังก์ชันปุ่มเข้าไปใน IIFE หลักของเกม
+- ดูผลการแข่งขันต่อ: เปลี่ยน state.screen เป็น end แล้วเรียก save/render จริง
+- เริ่มบริษัทใหม่: เรียก v2HardResetGame ของเกมโดยตรง
+- ไม่ใช้ CustomEvent หรือ script ภายนอกที่เข้าถึง state ไม่ได้อีกต่อไป
+-->
+<!-- PASS 126: FINANCIAL WARNING MODAL FIX
+- แก้กรณี state.financialWarning ถูกสร้าง แต่ไม่มี UI เรียกแสดง
+- Popup ใช้ระบบ v2ShowModal เดิมของเกม
+- แสดงหลังหน้า Result ถูก render เสร็จ
+- ล้าง financialWarning หลังเรียก Popup เพื่อไม่ให้ขึ้นซ้ำ
+-->
+<!-- PASS 125: FIX LOGISTICS SUBMIT
+- แก้ allSubs.map เป็น Object.values(allSubs).map ป้องกัน TypeError ตอนยืนยันส่งขาย
+- หากมีหนี้อยู่แล้ว เงินไม่พอจะไม่บล็อก Logistics
+- หลังรับเงินกู้แล้วอนุญาตให้ส่งขาย แม้วงเงินยังไม่ครอบคลุมค่าใช้จ่าย
+- เพิ่มฟังก์ชันคำนวณคะแนนล้มละลายที่ขาดหายไป
+-->
+<!-- PASS 124: ย้าย flow การเตือนล้มละลายไปผูกกับช่วงสรุปผล -->
+<!-- PASS 123: FIX financial popup script error -->
+<!-- PASS 122: เพิ่ม popup เตือนสถานะการเงิน -->
+<!-- PASS 121: BANKRUPTCY TIMING
+- สถานะติดลบจะตรวจ "หลังจบการขายทั้งหมดของไตรมาส"
+- คำนวณหลังรวมกำไร/ขาดทุนจากการขายและหักดอกเบี้ยแล้ว
+- หากเงินคงเหลือกลับมาเป็นมากกว่า 0 จะไม่ถูกนับเป็นสถานะติดลบ
+- bankruptcyStreak จะเพิ่มขึ้นเฉพาะเมื่อปิดงบไตรมาสแล้วยังมีเงินติดลบเท่านั้น
+-->
+<!-- PASS 120: BANKRUPTCY SYSTEM
+- หากกู้เงินแล้วเงินติดลบ ยังสามารถส่งหุ่นได้
+- แสดงข้อความเตือน "สถานะการเงินเสี่ยงล้มละลาย"
+- หากเงินติดลบ 2 ไตรมาสติดต่อกัน จะ Game Over
+- คะแนน ณ ขณะนั้นจะถูกเก็บไว้ใน state.bankruptcy.finalScore
+-->
+<!-- PASS 119: EYA-01 REBALANCE
+- อัตราออกจาก Galactic Gacha เพิ่มเป็น 50%
+- EYA-01 บังคับ Quality ขั้นต่ำ 70% แต่ผู้เล่นปรับได้ถึง 100%
+- รายได้จากการขาย EYA-01 ได้โบนัสเพิ่ม 10%
+- คง CP 10, Tier 3, สายพิเศษ และ Priority +20
+-->
+<!-- PASS 118: Demand Priority Rebalance: <50=0, 50-74=+1, 75-89=+2, 90+=+3 -->
+<!-- PASS 118: Demand priority rebalance pending manual review -->
+<!-- PASS 117: Galactic Pool ใช้ค่าเฉลี่ย Demand ของดาวที่ทุกบริษัทเลือก -->
+<!-- PASS 116: PLANET DEMAND AFFECTS GALACTIC POOL
+- Demand ดาวที่ผู้เล่นเลือกต่ำกว่า 50%: Galactic Pool ×0.90
+- Demand 50–74%: Galactic Pool ×1.25
+- Demand 75% ขึ้นไป: Galactic Pool ×1.50
+- ตัวคูณนี้คูณร่วมกับ poolMult ของ GLOBAL EVENT
+- โบนัส Priority จาก Demand ดาวยังทำงานเหมือนเดิม
+-->
 <!-- PASS 114: เพิ่มแท็กสายหุ่นและ Tier บนหน้า Command -->
 <!-- PASS 113: PLANET EVENT PRIORITY BUFF
 - ข่าวประจำดาวทุกประเภทได้รับ Priority เพิ่มจากเดิมอีก +1
@@ -9,7 +101,7 @@
 <!-- PASS 112: EYA-01 CLASSIFICATION UPDATE
 - จัด EYA-01 เป็นหุ่นสายพิเศษ
 - กำหนด EYA-01 เป็น Tier 3
-- คง CP 10, Quality 100%, Priority +20 และอัตรากาชา 40%
+- CP 10, Quality ขั้นต่ำ 70%, Priority +20, ราคาขาย +10% และอัตรากาชา 50%
 -->
 <!-- PASS 109: GACHA COST CHECK FIX
 - แก้ handler ที่ยังตรวจเงินขั้นต่ำ 300 Cr หลังลดราคากาชาเป็น 200 Cr
@@ -18,8 +110,8 @@
 <!-- PASS 106: GALACTIC GACHA INTEGRATION
 - เพิ่ม Galactic Gacha ใต้ Tech Tree ตั้งแต่ Q7
 - ใช้เอฟเฟกต์ NEW FEATURE UNLOCK เฉพาะการเปิด Gacha ครั้งแรก
-- สุ่ม 300 Cr ต่อครั้ง; EYA-01 มีโอกาสคงที่ 40%
-- หุ่นซ้ำสูญเปล่า; EYA-01 CP 10, Quality 100%, Priority +20
+- EYA-01 มีโอกาสคงที่ 50%
+- หุ่นซ้ำสูญเปล่า; EYA-01 CP 10, Quality ขั้นต่ำ 70%, Priority +20, ราคาขาย +10%
 -->
 <!-- PASS 105: PLANET EVENT BRAND REPORT FIX
 - โบนัส Brand +2 ของไคจูถูกบันทึกลง r.repDelta ก่อนสร้าง Report
@@ -599,8 +691,74 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
 
 
 
+
+/* ===== PASS 149 : RESULT INVENTORY GRID ===== */
+.result-head.result-head-balanced{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  gap:8px;
+  align-items:stretch;
+}
+
+.result-profit-block{
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  min-height:74px;
+}
+
+.result-sales-stack{
+  display:grid;
+  grid-template-rows:auto auto;
+  gap:6px;
+  min-width:0;
+}
+
+.result-sold-block{
+  min-width:0;
+}
+
+.result-inventory-row{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:2px;
+  padding-top:6px;
+  border-top:1px solid rgba(255,255,255,.08);
+  min-width:0;
+}
+
+.result-inventory-row .stat-label{
+  display:block;
+}
+
+.result-inventory-value{
+  display:block;
+  font-size:12px;
+  font-weight:900;
+  white-space:nowrap;
+  text-align:left;
+}
+
+.result-inventory-row .result-status{
+  display:block;
+  margin-top:0;
+  font-size:8.5px;
+  text-align:left;
+}
+
+@media(max-width:360px){
+  .result-head.result-head-balanced{
+    grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);
+  }
+  .result-head.result-head-balanced .big-number{
+    font-size:16px;
+  }
+}
+
+
 /* ---------- REPORT ---------- */
-.result-head{padding:var(--sp-3);display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.result-head{padding:var(--sp-3);display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
 .result-block{display:flex;flex-direction:column;gap:2px;min-width:0}
 .big-number{font-size:var(--fs-xl);font-weight:900;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .result-head .big-number{font-size:18px}
@@ -630,6 +788,234 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
 .dot{width:8px;height:8px;border-radius:2px}
 .leg span:nth-child(2){white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text)}
 .leg b{font-size:var(--fs-xs);color:#fff}
+
+
+
+/* PASS 135: base expansion cards */
+.build-base-card{
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  min-height:132px;padding:10px 8px;border-radius:12px;
+}
+.build-base-art{width:58px;height:58px;display:flex;align-items:center;justify-content:center}
+.build-base-name{font-size:10px;font-weight:900}
+.build-base-cost{font-size:9px;color:var(--muted)}
+.build-base-card.owned{
+  background:rgba(255,216,79,.08)!important;
+  border-color:rgba(255,216,79,.45)!important;
+  color:var(--gold)!important;
+  opacity:.9;
+}
+.build-base-owned{
+  font-size:9px;
+  color:var(--gold);
+  font-weight:900;
+}
+
+
+
+/* ===== PASS 139 : APPROVED BASE EXPANSION POPUP ===== */
+.base-choice-backdrop{
+  position:fixed;
+  inset:0;
+  z-index:220;
+  background:rgba(0,0,0,.55);
+  backdrop-filter:blur(10px);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:18px;
+}
+.base-choice-card{
+  width:min(370px,100%);
+  max-height:94vh;
+  overflow:auto;
+  border-radius:24px;
+  background:linear-gradient(180deg,#182538,#121d2d);
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:0 30px 80px rgba(0,0,0,.45);
+  position:relative;
+  animation:baseChoiceEnter .28s ease-out;
+}
+.base-choice-card::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:repeating-linear-gradient(
+    180deg,
+    rgba(255,255,255,.025) 0,
+    rgba(255,255,255,.025) 2px,
+    transparent 2px,
+    transparent 6px
+  );
+  pointer-events:none;
+}
+.base-choice-header{
+  padding:10px 16px;
+  border-bottom:1px solid rgba(255,255,255,.08);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.base-choice-title{
+  font-size:24px;
+  color:#ffd76c;
+  text-align:center;
+  font-weight:800;
+}
+.base-choice-unlock{
+  padding:14px;
+  display:flex;
+  gap:18px;
+  align-items:center;
+}
+.base-choice-holo{
+  width:96px;
+  height:96px;
+  flex:0 0 96px;
+  border-radius:22px;
+  background:
+    radial-gradient(circle,rgba(132,220,255,.25),transparent 65%),
+    linear-gradient(180deg,#17263c,#0d1624);
+  border:1px solid rgba(132,220,255,.22);
+  position:relative;
+  overflow:hidden;
+}
+.base-choice-holo::before{
+  content:"";
+  position:absolute;
+  inset:18px;
+  border:2px solid rgba(132,220,255,.6);
+  transform:rotate(45deg);
+  animation:baseChoiceSpin 10s linear infinite;
+}
+.base-choice-holo::after{
+  content:"✦";
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:42px;
+  color:#84dcff;
+}
+.base-choice-desc{flex:1;min-width:0}
+.base-choice-desc h3{
+  margin:0 0 10px;
+  font-size:16px;
+  color:#ffd76c;
+  text-align:center;
+}
+.base-choice-desc p{
+  margin:0;
+  color:#92a5c2;
+  line-height:1.55;
+  font-size:14px;
+}
+.base-choice-notice{
+  margin-top:14px;
+  padding:10px 12px;
+  border-radius:12px;
+  background:rgba(132,220,255,.08);
+  border:1px solid rgba(132,220,255,.15);
+  font-size:12px;
+  color:#84dcff;
+}
+.base-choice-required{
+  padding:0 22px 18px;
+  color:#ffd770;
+  font-size:13px;
+  font-weight:700;
+  text-align:center;
+}
+.base-choice-planets{
+  padding:0 10px 10px;
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+}
+.base-choice-planet{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  min-width:0;
+  min-height:82px;
+  text-align:center;
+  border-radius:16px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.08);
+  color:#eef5ff;
+  padding:14px;
+  cursor:pointer;
+  transition:.18s;
+}
+.base-choice-planet:hover:not(:disabled){
+  transform:translateY(-2px);
+  background:rgba(255,255,255,.07);
+}
+.base-choice-planet-art{
+  width:74px;
+  height:74px;
+  display:grid;
+  place-items:center;
+  margin-bottom:8px;
+  border-radius:18px;
+  background:
+    radial-gradient(circle at 50% 45%,rgba(132,220,255,.17),transparent 62%),
+    rgba(255,255,255,.025);
+  border:1px solid rgba(132,220,255,.10);
+}
+.base-choice-planet-art .loc-pixel-planet{
+  transform:scale(1.18);
+  transform-origin:center;
+}
+.base-choice-planet:hover:not(:disabled) .loc-pixel-planet{
+  transform:scale(.92);
+}
+.base-choice-name{
+  font-size:13px;
+  font-weight:800;
+}
+.base-choice-cost{
+  display:block;
+  margin-top:4px;
+  font-size:11px;
+  color:#92a5c2;
+  font-weight:600;
+}
+.base-choice-status{
+  display:block;
+  margin-top:6px;
+  font-size:11px;
+  font-weight:800;
+  color:#ffe08a;
+  letter-spacing:.4px;
+}
+.base-choice-planet.owned,
+.base-choice-planet.building{
+  background:rgba(255,215,112,.14);
+  border-color:rgba(255,215,112,.35);
+  color:#ffe08a;
+  cursor:not-allowed;
+  opacity:.9;
+}
+.base-choice-planet.owned .base-choice-cost,
+.base-choice-planet.building .base-choice-cost{
+  color:#ffe08a;
+}
+@keyframes baseChoiceSpin{
+  to{transform:rotate(405deg)}
+}
+@keyframes baseChoiceEnter{
+  from{opacity:0;transform:translateY(24px) scale(.95)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+@media(max-width:520px){
+  .base-choice-unlock{padding:18px;gap:14px}
+  .base-choice-holo{width:94px;height:94px;flex-basis:94px}
+  .base-choice-title{font-size:21px}
+  .base-choice-planets{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
 
 
 /* ---------- 8-player / AI difficulty ---------- */
@@ -2681,6 +3067,474 @@ section.page.cmd.command-locked .actions{
   to{opacity:1}
 }
 
+
+/* PASS 122: Financial warning popup */
+.financial-warning-popup{
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(0,0,0,.72);
+  backdrop-filter:blur(4px);
+}
+
+.financial-warning-card{
+  width:min(92vw,420px);
+  padding:20px;
+  border-radius:18px;
+  border:1px solid rgba(255,90,90,.45);
+  background:linear-gradient(180deg,#381515,#1d0d0d);
+  box-shadow:0 12px 40px rgba(0,0,0,.55);
+  text-align:center;
+}
+
+.financial-warning-icon{
+  font-size:42px;
+  margin-bottom:10px;
+}
+
+.financial-warning-title{
+  color:#ffb0b0;
+  font-size:20px;
+  font-weight:800;
+  margin-bottom:8px;
+}
+
+.financial-warning-text{
+  color:#ffdcdc;
+  font-size:14px;
+  line-height:1.5;
+}
+
+.financial-warning-btn{
+  margin-top:16px;
+  width:100%;
+}
+
+
+/* ===== PASS 127 : HOLOGRAM BANKRUPTCY SCREEN ===== */
+.bankrupt-screen{
+  position:relative;
+  min-height:100%;
+  padding:18px;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255,90,90,.18), transparent 32%),
+    linear-gradient(180deg,#040913,#07111d 55%, #03060b);
+}
+.bankrupt-screen::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:
+    repeating-linear-gradient(
+      180deg,
+      rgba(120,180,255,.04) 0px,
+      rgba(120,180,255,.04) 2px,
+      transparent 2px,
+      transparent 6px
+    );
+  animation:holoScan 10s linear infinite;
+}
+@keyframes holoScan{
+  from{transform:translateY(0)}
+  to{transform:translateY(12px)}
+}
+.bankrupt-ring{
+  position:absolute;
+  width:320px;
+  height:320px;
+  border:1px solid rgba(255,84,112,.22);
+  border-radius:50%;
+  left:50%;
+  top:-80px;
+  transform:translateX(-50%);
+  animation:bankruptRotate 18s linear infinite;
+}
+@keyframes bankruptRotate{
+  from{transform:translateX(-50%) rotate(0deg)}
+  to{transform:translateX(-50%) rotate(360deg)}
+}
+.bankrupt-card{
+  position:relative;
+  z-index:2;
+  overflow:hidden;
+  border-radius:22px;
+  border:1px solid rgba(255,255,255,.08);
+  background:linear-gradient(180deg,rgba(17,31,48,.95),rgba(6,12,20,.96));
+  box-shadow:0 20px 70px rgba(0,0,0,.55);
+}
+.bankrupt-head{
+  padding:24px 18px;
+  text-align:center;
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+.bankrupt-system{
+  font-size:10px;
+  letter-spacing:3px;
+  color:#ff9ca8;
+  font-weight:900;
+}
+.bankrupt-title{
+  margin-top:8px;
+  font-size:38px;
+  font-weight:1000;
+  color:#ff6579;
+  text-shadow:0 0 20px rgba(255,84,112,.45);
+}
+.bankrupt-sub{
+  margin-top:6px;
+  color:#ffd3da;
+  font-size:12px;
+}
+.bankrupt-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+  padding:18px;
+}
+.bankrupt-box{
+  border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.03);
+  border-radius:14px;
+  padding:10px;
+}
+.bankrupt-k{
+  font-size:9px;
+  color:#8fa5ba;
+}
+.bankrupt-v{
+  margin-top:6px;
+  font-size:22px;
+  font-weight:900;
+}
+.bankrupt-msg{
+  margin:0 18px 18px;
+  border:1px solid rgba(255,84,112,.18);
+  background:rgba(255,84,112,.08);
+  border-radius:14px;
+  padding:14px;
+  line-height:1.5;
+  font-size:12px;
+}
+@media(max-width:520px){
+  .bankrupt-grid{grid-template-columns:1fr;}
+  .bankrupt-title{font-size:30px}
+}
+
+
+/* ===== PASS 128 : BANKRUPTCY ANIMATION ===== */
+
+.bankrupt-card{
+  animation: hologramBoot .9s ease-out;
+}
+
+.bankrupt-title{
+  animation:
+    hologramFlicker 3s infinite,
+    titlePulse 2.5s ease-in-out infinite;
+}
+
+.bankrupt-ring{
+  animation:
+    bankruptRotate 18s linear infinite,
+    ringPulse 2.8s ease-in-out infinite;
+}
+
+.bankrupt-grid .bankrupt-box{
+  opacity:0;
+  transform:translateY(14px);
+  animation: dataReveal .5s ease-out forwards;
+}
+
+.bankrupt-grid .bankrupt-box:nth-child(1){ animation-delay:.15s; }
+.bankrupt-grid .bankrupt-box:nth-child(2){ animation-delay:.3s; }
+.bankrupt-grid .bankrupt-box:nth-child(3){ animation-delay:.45s; }
+
+.bankrupt-screen::after{
+  content:'';
+  position:absolute;
+  inset:-20%;
+  pointer-events:none;
+  background:linear-gradient(
+    180deg,
+    transparent,
+    rgba(120,220,255,.12),
+    transparent
+  );
+  animation: scannerSweep 4s linear infinite;
+}
+
+@keyframes hologramBoot{
+  0%{
+    opacity:0;
+    transform:scale(.95) translateY(30px);
+    filter:blur(8px);
+  }
+  100%{
+    opacity:1;
+    transform:scale(1) translateY(0);
+    filter:blur(0);
+  }
+}
+
+@keyframes titlePulse{
+  0%,100%{ transform:scale(1); }
+  50%{ transform:scale(1.04); }
+}
+
+@keyframes hologramFlicker{
+  0%,18%,22%,100%{ opacity:1; }
+  20%,21%{ opacity:.55; }
+}
+
+@keyframes ringPulse{
+  0%,100%{ opacity:.35; }
+  50%{ opacity:.9; }
+}
+
+@keyframes dataReveal{
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+@keyframes scannerSweep{
+  from{
+    transform:translateY(-120%);
+  }
+  to{
+    transform:translateY(120%);
+  }
+}
+
+
+/* ===== PASS 129 : SIGNAL GLITCH ===== */
+
+.bankrupt-screen.glitch-active{
+  animation: screenGlitch 6s infinite;
+}
+
+.bankrupt-card::before,
+.bankrupt-card::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  opacity:0;
+}
+
+.bankrupt-card::before{
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255,0,80,.12),
+    transparent
+  );
+  animation: glitchFlash 5s infinite;
+}
+
+.bankrupt-card::after{
+  background:
+    repeating-linear-gradient(
+      180deg,
+      transparent 0px,
+      transparent 3px,
+      rgba(255,255,255,.05) 3px,
+      rgba(255,255,255,.05) 4px
+    );
+  mix-blend-mode: screen;
+  animation: glitchNoise 3.5s infinite;
+}
+
+.bankrupt-title{
+  animation:
+    hologramFlicker 3s infinite,
+    titlePulse 2.5s ease-in-out infinite,
+    titleGlitch 7s infinite;
+}
+
+@keyframes screenGlitch{
+  0%, 91%, 100%{
+    transform: translate(0,0);
+    filter: none;
+  }
+
+  92%{
+    transform: translate(-2px,1px);
+    filter: hue-rotate(15deg);
+  }
+
+  93%{
+    transform: translate(3px,-2px);
+  }
+
+  94%{
+    transform: translate(-4px,0px);
+    filter: contrast(1.25);
+  }
+
+  95%{
+    transform: translate(2px,2px);
+  }
+
+  96%{
+    transform: translate(0,0);
+  }
+}
+
+@keyframes titleGlitch{
+  0%, 94%, 100%{
+    text-shadow: 0 0 20px rgba(255,84,112,.45);
+  }
+
+  95%{
+    text-shadow:
+      -3px 0 rgba(0,255,255,.75),
+      3px 0 rgba(255,0,80,.75),
+      0 0 30px rgba(255,84,112,.55);
+  }
+
+  96%{
+    text-shadow:
+      4px 0 rgba(0,255,255,.6),
+      -4px 0 rgba(255,0,80,.6);
+  }
+}
+
+@keyframes glitchFlash{
+  0%,93%,100%{
+    opacity:0;
+  }
+
+  94%,95%{
+    opacity:1;
+  }
+}
+
+@keyframes glitchNoise{
+  0%,90%,100%{
+    opacity:0;
+  }
+
+  91%,96%{
+    opacity:.7;
+  }
+}
+
+
+/* ===== PASS 130 : BANKRUPTCY SEQUENCE ===== */
+
+.bankrupt-screen{
+  animation: freezeFrame .2s steps(1,end);
+}
+
+.bankrupt-card{
+  opacity: 0;
+  transform: scale(.96);
+  animation:
+    bankruptcyReveal .7s ease-out .2s forwards;
+}
+
+.bankrupt-title,
+.bankrupt-system,
+.bankrupt-sub,
+.bankrupt-grid,
+.bankrupt-msg,
+.bankrupt-actions{
+  opacity:0;
+  animation: delayedAppear .45s ease-out .45s forwards;
+}
+
+.bankrupt-actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin:18px;
+}
+
+.bankrupt-btn{
+  border:none;
+  border-radius:14px;
+  padding:16px;
+  font-size:15px;
+  font-weight:900;
+  cursor:pointer;
+}
+
+.bankrupt-btn.primary{
+  background:linear-gradient(180deg,#ffd96a,#dca832);
+  color:#111;
+}
+
+.bankrupt-btn.secondary{
+  background:#23354f;
+  color:#eef3ff;
+}
+
+@media(max-width:520px){
+  .bankrupt-actions{
+    grid-template-columns:1fr;
+  }
+}
+
+@keyframes freezeFrame{
+  from{filter:brightness(0.2);}
+  to{filter:brightness(1);}
+}
+
+@keyframes bankruptcyReveal{
+  from{
+    opacity:0;
+    transform:scale(.96);
+    filter:blur(10px);
+  }
+  to{
+    opacity:1;
+    transform:scale(1);
+    filter:blur(0);
+  }
+}
+
+@keyframes delayedAppear{
+  from{
+    opacity:0;
+    transform:translateY(10px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+
+
+
+/* PASS 146: visually center Colony 7 inside its planet frame */
+.base-choice-planet-art{
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.base-choice-planet-art .loc-pixel-planet.colony7{
+  position:relative;
+  left:0;
+  top:0;
+  margin:0 auto;
+  transform:scale(1.02);
+  transform-origin:center center;
+}
+
+.base-choice-planet:hover:not(:disabled) .loc-pixel-planet.colony7{
+  transform:scale(1.08);
+}
+
 </style>
 <style>
 /* PASS 22: centered first Ball unlock */
@@ -2814,9 +3668,15 @@ section.page.cmd.command-locked .actions{
   }
 
   function marketReferencePrice(unit) {
+    const id = String((unit && unit.id) || '');
     const t = Number((unit && unit.tier) || 0);
-    const refs = [5,10,18,34];
-    return refs[Math.max(0,Math.min(3,t))] * (unit && unit.special ? 1.12 : 1);
+
+    if(id === 'ball' || id === 'ball-kai') return 5;
+    if(t === 1) return 10;
+    if(t === 2) return 20;
+    if(t === 3) return 35;
+
+    return 5;
   }
 
   function marketVariantPriority(unit) {
@@ -2838,7 +3698,7 @@ section.page.cmd.command-locked .actions{
 
   const UNIT_TYPES = [
     { id:'ball', tier:0, branch:'basic', cpCost:1, baseCost:3.0, basePrice:5.2, rnd:'low', price:'low', name:'Ball', tag:'โรงศพอวกาศติดปืน แต่ยอดขายกลับดีเกินคาด', sprite:'ball', kind:'ball' },
-    { id:'ball-kai', tier:0, branch:'basic', cpCost:1, baseCost:3.8, basePrice:6.2, rnd:'low', price:'low', name:'Ball Kai', tag:'โรงศพอวกาศเหมือนเดิม แต่คราวนี้ติดแอร์แล้ว', sprite:'ballKai', kind:'ball' },
+    { id:'ball-kai', tier:0, special:true, branch:'basic', cpCost:1, baseCost:3.8, basePrice:6.2, rnd:'low', price:'low', name:'Ball Kai', tag:'โรงศพอวกาศเหมือนเดิม แต่คราวนี้ติดแอร์แล้ว', sprite:'ballKai', kind:'ball' },
 
     { id:'zagu', tier:1, branch:'zagu', cpCost:2, baseCost:7.0, basePrice:11.0, rnd:'mid', price:'low', name:'Zagu', tag:'หุ่นรุ่นผลิตจำนวนมากที่พบเห็นได้แทบทุกบ้าน', sprite:'zagu' },
     { id:'doz', tier:2, branch:'zagu', cpCost:3, baseCost:12.0, basePrice:18.0, rnd:'mid', price:'mid', name:'Doz', tag:'หุ่นรุ่นใหม่ที่กินเชื้อเพลิงพอ ๆ กับยานรบขนาดเล็ก', sprite:'doz' },
@@ -3616,7 +4476,8 @@ section.page.cmd.command-locked .actions{
       const matchedPreferred = !!(event.preferredUnitId && (event.preferredUnitId === r.unit.id || event.preferredUnitId === r.unit.baseId));
       const marketBonus = matchedPreferred ? 0.10 : 0;
       const contractBonus = activeUnitContractBonus(r.player, r.unit.id, r.unit.baseId, r.sub.quality ?? r.sub.rndFocus ?? 50);
-      const revenue = unitsSold * r.econ.unitPrice * (1 + marketBonus + contractBonus);
+      const eyaSaleBonus = r.unit.id==='eya-01' ? 0.10 : 0;
+      const revenue = unitsSold * r.econ.unitPrice * (1 + marketBonus + contractBonus + eyaSaleBonus);
 
       // ต้นทุนสินค้าที่ขายจริง:
       // ของเก่าใช้ต้นทุนที่ติดมากับแต่ละล็อต ส่วนของใหม่ใช้ต้นทุนต่อเครื่องของรอบนี้
@@ -3648,7 +4509,7 @@ section.page.cmd.command-locked .actions{
         inventoryQty:holding.qty, inventoryValue:holding.value,
         inventoryRate:holding.rate, inventoryCost:holding.cost,
         revenue, cogs, grossProductProfit, productionCost, cost, profit,
-        matchedPreferred, marketBonus, contractBonus,
+        matchedPreferred, marketBonus, contractBonus, eyaSaleBonus,
         performanceBonus, perfTriggered
       };
     });
@@ -4324,6 +5185,10 @@ function bindCommon(){
     el.oninput=()=>{
       AudioEngine.sliderTick(el.value);
       state.decision[el.dataset.slider]=Number(el.value);
+      if(el.dataset.slider==='quality' && state.decision.unitId==='eya-01'){
+        state.decision.quality=Math.max(70,Number(state.decision.quality||0));
+        el.value=state.decision.quality;
+      }
 
       if(el.dataset.slider==='lobby'){
         const player=me();
@@ -4544,7 +5409,7 @@ function investmentPreview(c){
 }
 function currentCalc(){
   normalizeUnit(); const p=me(), d=state.decision;
-  if(d.unitId==='eya-01') d.quality=100;
+  if(d.unitId==='eya-01') d.quality=Math.max(70,Number(d.quality||0));
   d.lobby=clamp(Number(d.lobby||0),0,100);
   d.factoryInvest=GameData.effectiveFactoryInvestment(p,d.factoryInvest);
   d.rndInvest=0;
@@ -5052,19 +5917,23 @@ function renderReport(){
 
   return `<section class="page report">
     <div class="page-body">
-      <div class="card result-head">
-        <div class="result-block">
+      <div class="card result-head result-head-balanced">
+        <div class="result-block result-profit-block">
           <span class="stat-label">ผลประกอบการ</span>
           <span class="big-number ${profitClass}">${you.profit>=0?'+':''}${fmt(you.profit)} Cr.</span>
         </div>
-        <div class="result-block">
-          <span class="stat-label">ขายทั้งหมด</span>
-          <span class="big-number blue">${you.unitsSold} เครื่อง</span>
-        </div>
-        <div class="result-block">
-          <span class="stat-label">สินค้าคงเหลือ</span>
-          <span class="big-number ${Number(you.inventoryQty||0)===0?'green':'yellow'}">${you.inventoryQty||0} เครื่อง</span>
-          <span class="result-status ${Number(you.inventoryQty||0)===0?'sold-out':'in-stock'}">${Number(you.inventoryQty||0)===0?'ขายหมด':'มีของค้าง'}</span>
+
+        <div class="result-sales-stack">
+          <div class="result-block result-sold-block">
+            <span class="stat-label">ขายทั้งหมด</span>
+            <span class="big-number blue">${you.unitsSold} เครื่อง</span>
+          </div>
+
+          <div class="result-inventory-row">
+            <span class="stat-label">สินค้าคงเหลือ</span>
+            <span class="result-inventory-value ${Number(you.inventoryQty||0)===0?'green':'yellow'}">${you.inventoryQty||0} เครื่อง</span>
+            <span class="result-status ${Number(you.inventoryQty||0)===0?'sold-out':'in-stock'}">${Number(you.inventoryQty||0)===0?'ขายหมด':'มีของค้าง'}</span>
+          </div>
         </div>
       </div>
 
@@ -5142,7 +6011,72 @@ function renderGame(){
   bindCommon();
   applyCommandLock();
 }
-function render(){ ensureState(); if(state.screen==='end') return renderEnd(); if(!state.players.length || state.screen==='home') renderHome(); else renderGame(); }
+
+function renderBankruptcyHologram(data){
+  const score = Math.round(data?.finalScore || 0);
+  const debt = Math.round(data?.debt || 0);
+  const cash = Math.round(data?.cash || 0);
+
+  return `
+    <div class="page bankrupt-screen glitch-active">
+      <div class="bankrupt-ring"></div>
+
+      <div class="bankrupt-card">
+        <div class="bankrupt-head">
+          <div class="bankrupt-system">CORPORATE FAILURE DETECTED</div>
+          <div class="bankrupt-title">BANKRUPTCY</div>
+          <div class="bankrupt-sub">
+            บริษัทของคุณถูกบังคับให้ออกจากตลาด
+          </div>
+        </div>
+
+        <div class="bankrupt-grid">
+          <div class="bankrupt-box">
+            <div class="bankrupt-k">เงินคงเหลือ</div>
+            <div class="bankrupt-v red">${cash} Cr</div>
+          </div>
+
+          <div class="bankrupt-box">
+            <div class="bankrupt-k">หนี้สิน</div>
+            <div class="bankrupt-v">${debt} Cr</div>
+          </div>
+
+          <div class="bankrupt-box">
+            <div class="bankrupt-k">คะแนนสุดท้าย</div>
+            <div class="bankrupt-v yellow">${score}</div>
+          </div>
+        </div>
+
+        <div class="bankrupt-msg">
+          บริษัทของคุณมีเงินติดลบติดต่อกัน 2 ไตรมาส
+          ระบบได้ยุติการดำเนินงานทั้งหมดแล้ว
+          แต่คะแนนของคุณจะยังถูกนำไปจัดอันดับเมื่อฤดูกาลสิ้นสุดลง
+        </div>
+
+        <div class="bankrupt-actions">
+          <button class="bankrupt-btn primary"
+            onclick="window.mspcRestartAfterBankruptcy()">
+            เริ่มบริษัทใหม่
+          </button>
+
+          <button class="bankrupt-btn secondary"
+            onclick="window.mspcContinueAfterBankruptcy()">
+            ดูผลการแข่งขันต่อ
+          </button>
+        </div>
+
+      </div>
+    </div>
+  `;
+}
+
+function render(){
+  if(state.screen==='bankrupt'){
+    app.innerHTML = renderBankruptcyHologram(state.bankruptcy||{});
+    return;
+  }
+
+ ensureState(); if(state.screen==='end') return renderEnd(); if(!state.players.length || state.screen==='home') renderHome(); else renderGame(); }
 window.addEventListener('error', e=>{app.innerHTML=`<main class="phone">${newGameButtonHTML()}<section class="card start-panel"><h2 class="red">Game Error</h2><pre>${esc(e.message)}\n${esc(e.filename)}:${e.lineno}</pre><button id="resetGame" class="btn btn-primary">ล้างเซฟ</button></section></main>`; const b=$('#resetGame'); if(b)b.onclick=()=>{safeStorage.removeItem(KEY); location.reload();}; document.querySelectorAll('[data-new-game]').forEach(btn=>btn.onclick=startNewGame); document.querySelectorAll('[data-sound-toggle]').forEach(btn=>btn.onclick=()=>AudioEngine.toggle()); AudioEngine.updateButtons();});
 
 document.addEventListener('click',e=>{
@@ -6092,7 +7026,7 @@ function v2PrepareHints(){
 
     const event=candidates[Math.floor(Math.random()*candidates.length)];
     usedEventIds.add(event.id);
-    hints.push({...event,planetId:planet.id});
+    hints.push({...event,level:Number(event.level||0)+1,planetId:planet.id});
   });
 
   state.v2PlanetHints=hints;
@@ -6150,7 +7084,7 @@ function v2DemandPercent(planetId){
 
 function v2DemandPriority(planetId){
   const pct=v2DemandPercent(planetId);
-  return pct>=85?3:pct>=70?2:pct>=55?1:0;
+  return pct>=90?3:pct>=75?2:pct>=50?1:0;
 }
 
 // ชื่อเดิมคงไว้เพื่อไม่ให้เซฟหรือโค้ดเก่าส่วนอื่นเสีย
@@ -6202,6 +7136,7 @@ function v2EnsureState(){
   if(!('techChoice' in state.decision)) state.decision.techChoice=null;
   if(!('techDone' in state.decision)) state.decision.techDone=false;
   if(!('gachaResult' in state.decision)) state.decision.gachaResult=null;
+  if(!('gachaPopupOpen' in state.decision)) state.decision.gachaPopupOpen=false;
 }
 function v2ProcessBaseBuilds(player){
   const complete=(player.baseBuilds||[]).filter(b=>b.completeRound<=state.round);
@@ -6374,14 +7309,30 @@ renderBriefing = function(){
 
 
 function v2GachaResultCard(result){
-  if(!result) return '';
+  if(!result || !state.decision.gachaPopupOpen) return '';
   const u=v2Unit(result.id), duplicate=!!result.duplicate;
-  return `<div class="card v2-gacha-result ${u.id==='eya-01'?'secret':''}">
-    <div class="v2-gacha-result-art">${unitIcon(u,'mech')}</div>
-    <div class="v2-gacha-result-copy">
-      <b>${esc(u.name)}</b>
-      <span>${duplicate?'หุ่นซ้ำ — การสุ่มครั้งนี้สูญเปล่า':u.id==='eya-01'?'หุ่นยนต์คุณภาพที่พร้อมเปลี่ยนคนขับให้เป็นน้ำส้ม':'ปลดล็อกเข้าสู่สายการผลิตแล้ว'}</span>
-      <div class="v2-gacha-result-tags">${u.id==='eya-01'?'<i>Priority +20</i><i>CP 10</i><i>Quality 100%</i>':duplicate?'<i>ไม่ได้รับอะไร</i>':'<i>ปลดล็อกทันที</i><i>ไม่ใช้ RP</i>'}</div>
+  const secret=u.id==='eya-01';
+
+  return `<div class="v2-gacha-popup-backdrop">
+    <div class="v2-gacha-popup ${secret?'secret':''}">
+      <div class="v2-gacha-light light-a"></div>
+      <div class="v2-gacha-light light-b"></div>
+      <div class="v2-gacha-flare"></div>
+
+      ${secret?`<div class="v2-gacha-secret-banner">SECRET UNIT</div>`:''}
+
+      <div class="v2-gacha-popup-content">
+        <div class="v2-gacha-popup-kicker">${duplicate?'DUPLICATE DATA':'UNIT ACQUIRED'}</div>
+        <div class="v2-gacha-popup-art">${unitIcon(u,'mech')}</div>
+        <div class="v2-gacha-popup-name">${esc(u.name)}</div>
+        <div class="v2-gacha-popup-desc">
+          ${duplicate?'หุ่นซ้ำ — การสุ่มครั้งนี้สูญเปล่า':secret?'หุ่นยนต์คุณภาพที่พร้อมเปลี่ยนคนขับให้เป็นน้ำส้ม':'ปลดล็อกเข้าสู่สายการผลิตแล้ว'}
+        </div>
+        <div class="v2-gacha-popup-tags">
+          ${secret?'<i>Priority +20</i><i>CP 10</i><i>Quality 70%+</i><i>ราคาขาย +10%</i>':duplicate?'<i>ไม่ได้รับอะไร</i>':'<i>ปลดล็อกทันที</i><i>ไม่ใช้ RP</i>'}
+        </div>
+        <button class="v2-gacha-popup-close" data-gacha-popup-close>รับทราบ</button>
+      </div>
     </div>
   </div>`;
 }
@@ -6400,7 +7351,7 @@ function v2RenderGacha(player){
       <div class="v2-gacha-copy">
         <div class="v2-gacha-title">GALACTIC GACHA</div>
         <p>ลุ้นกาชาปลดล็อกหุ่นโดยไม่ใช้ค่า RP<br>หุ่นซ้ำหรือหุ่นที่ปลดแล้วจะสูญเปล่า</p>
-        <div class="v2-gacha-rules"><span>200 Cr / ครั้ง</span><span>EYA-01 40%</span></div>
+        <div class="v2-gacha-rules"><span>200 Cr / ครั้ง</span><span>EYA-01 50%</span></div>
         <button class="v2-gacha-btn" data-gacha-pull ${canPay?'':'disabled'}>${canPay?'สุ่ม 1 ครั้ง · 200 Cr':'เงินไม่พอ'}</button>
       </div>
       <div class="v2-gacha-machine" aria-hidden="true">
@@ -6514,8 +7465,23 @@ function renderLocation(){
   }).join('');
 
   const buildOptions=!resolved&&slots>0
-    ? V2_PLANETS.filter(pl=>pl.id!==p.homePlanet&&!(p.bases||[]).includes(pl.id)&&!(p.baseBuilds||[]).some(b=>b.planetId===pl.id))
-      .map(pl=>`<button class="mini-btn" data-build-base="${pl.id}">สร้างฐานที่ ${pl.name}</button>`).join('')
+    ? V2_PLANETS.map(pl=>{
+        const home=pl.id===p.homePlanet;
+        const owned=home||(p.bases||[]).includes(pl.id);
+        const building=(p.baseBuilds||[]).some(b=>b.planetId===pl.id);
+        const disabled=owned||building;
+        const transport=v2TransportCost(p,pl.id,c.prod);
+        const status=building?'กำลังก่อสร้าง':owned?'มีโรงงานแล้ว':'';
+
+        return `<button class="base-choice-planet ${owned?'owned':''} ${building?'building':''}"
+          ${disabled?'disabled':''}
+          ${disabled?'':`data-build-base="${pl.id}"`}>
+          <div class="base-choice-planet-art">${v2PlanetArt(pl.id)}</div>
+          <span class="base-choice-name">${esc(pl.name)}</span>
+          <small class="base-choice-cost">${transport?`ค่าขนส่ง ${fmt(transport)} Cr.`:'ค่าขนส่ง 0 Cr.'}</small>
+          ${status?`<small class="base-choice-status">${status}</small>`:''}
+        </button>`;
+      }).join('')
     : '';
 
   return `<section class="page location logistics ${resolved?'v2-location-resolved':''}">
@@ -6549,7 +7515,36 @@ function renderLocation(){
 
       <div class="loc-planet-grid">${cards}</div>
 
-      ${buildOptions?`<div class="card"><div class="section-title"><span class="text">สิทธิ์ตั้งฐานใหม่</span><span class="badge">${slots}</span></div><div class="v2-build-list">${buildOptions}</div></div>`:''}
+      ${buildOptions?`
+      <div class="base-choice-backdrop">
+        <div class="base-choice-card">
+          <div class="base-choice-header">
+            
+          </div>
+
+          <div class="base-choice-unlock">
+            <div class="base-choice-holo"></div>
+
+            <div class="base-choice-desc">
+              <h3>ปลดล็อกการขยายโรงงาน</h3>
+              <p>
+                บริษัทของคุณมีขนาดใหญ่พอที่จะขยายสายการผลิตได้แล้ว
+                การขยายฐานการผลิตใหม่จะทำให้ฐานนั้นไม่เสียค่าขนส่ง
+              </p>
+
+              <div class="base-choice-notice">
+                ฐานจะสร้างเสร็จในไตรมาสถัดไป
+              </div>
+            </div>
+          </div>
+
+          <div class="base-choice-required">
+            กรุณาเลือกดาว 1 ดวงเพื่อขยายสายการผลิต
+          </div>
+
+          <div class="base-choice-planets">${buildOptions}</div>
+        </div>
+      </div>`:''}
 
       <div class="loc-summary">
         <div class="loc-summary-icon">${v2PlanetArt(chosen)}</div>
@@ -6593,15 +7588,9 @@ async function v2MaybeLoan(player,need){
 
   const currentDebt=Math.max(0,Number(player.regularDebt||0));
   if(currentDebt>0){
-    await v2ShowModal({
-      tone:'red',
-      title:'ยังมีหนี้คงค้าง',
-      icon:'🏦',
-      message:`หนี้ปัจจุบัน ${fmt(currentDebt)} Cr.`,
-      detail:'ต้องชำระหนี้ก้อนเดิมเต็มจำนวนก่อน จึงจะสามารถกู้ใหม่ได้',
-      confirmText:'รับทราบ'
-    });
-    return false;
+    // มีหนี้อยู่แล้ว: อนุญาตให้ส่งคำสั่งต่อ แม้เงินสดไม่พอ
+    // สถานะล้มละลายจะประเมินหลังสรุปยอดขายและหักดอกเบี้ย
+    return true;
   }
 
   const amount=v2LoanOffer(player);
@@ -6624,7 +7613,9 @@ async function v2MaybeLoan(player,need){
   player.debt=amount;
   save();
 
-  return player.funds>=need;
+  // หลังรับเงินกู้แล้วอนุญาตให้ส่งขาย แม้ยอดเงินจะยังต่ำกว่าค่าใช้จ่าย
+  // เงินคงเหลือจริงจะถูกประเมินหลัง Result
+  return true;
 }
 
 
@@ -6691,6 +7682,26 @@ function v2RepayDebt(player){
   return debt;
 }
 
+function v2BankruptcyFinalScore(player){
+  const p=player||{};
+  const unlocked=v2Unlocked(p);
+  const tier3=['salami','new-rx','gbaley','magz'].filter(id=>unlocked.has(id)).length;
+  const complete=V2_BRANCHES.every(br=>br.ids.some(id=>unlocked.has(id)));
+  const baseBonus=[0,50,150,300][Math.min(3,(p.bases||[]).length)]||0;
+  const tierBonus=[0,100,250,450,650][tier3]||0;
+  const completeBonus=complete?200:0;
+  const debt=Number(p.regularDebt||0);
+  return Number(p.funds||0)
+    + Number(p.reputation||0)*20
+    + Number(p.capacity||0)*(GameData.EXPANSION_COST_PER_UNIT*.5)
+    + unlocked.size*40
+    + Number(p.rp||0)*.5
+    + baseBonus
+    + tierBonus
+    + completeBonus
+    - debt;
+}
+
 submitRound = async function(){
   v2EnsureState();
   if(state.lastReport){
@@ -6701,19 +7712,51 @@ submitRound = async function(){
     return;
   }
   AudioEngine.sfx('submit');
-  const p=me(),d=state.decision; normalizeUnit();
-  const c=currentCalc();
-  const ship=v2TransportCost(p,d.location,c.prod);
-  const need=Math.ceil(c.estimatedTotal+ship);
-  if(!(await v2MaybeLoan(p,need))){ await v2ShowModal({tone:'red',title:'ยกเลิกคำสั่ง',message:'เงินทุนไม่เพียงพอสำหรับดำเนินคำสั่งนี้',confirmText:'รับทราบ'}); return; }
+  const p=me();
+  const eliminated=!!p.eliminated;
+  let d,c,ship=0,need=0;
+
+  if(eliminated){
+    d={
+      unitId:'ball',
+      quality:50,
+      priceStrategy:100,
+      prodPct:0,
+      lobby:0,
+      factoryInvest:0,
+      rndInvest:0,
+      location:p.homePlanet||V2_PLANETS[0].id
+    };
+    c={prod:0,estimatedTotal:0};
+  }else{
+    d=state.decision;
+    normalizeUnit();
+    c=currentCalc();
+    ship=v2TransportCost(p,d.location,c.prod);
+    need=Math.ceil(c.estimatedTotal+ship);
+    if(!(await v2MaybeLoan(p,need))){
+      await v2ShowModal({
+        tone:'red',
+        title:'ยกเลิกคำสั่ง',
+        message:'เงินทุนไม่เพียงพอสำหรับดำเนินคำสั่งนี้',
+        confirmText:'รับทราบ'
+      });
+      return;
+    }
+  }
 
   const allSubs={};
-  allSubs[p.id]={...d,production:c.prod,location:d.location,lobby:clamp(Number(d.lobby||0),0,100),factoryInvest:GameData.effectiveFactoryInvestment(p,d.factoryInvest),rndInvest:GameData.effectiveRndInvestment(p,d.rndInvest)};
+  allSubs[p.id]=eliminated
+    ? {...d,production:0}
+    : {...d,production:c.prod,location:d.location,lobby:clamp(Number(d.lobby||0),0,100),factoryInvest:GameData.effectiveFactoryInvestment(p,d.factoryInvest),rndInvest:GameData.effectiveRndInvestment(p,d.rndInvest)};
   state.players.slice(1).forEach(bot=>allSubs[bot.id]=v2AutoDecision(bot));
 
   // ขั้นแรก: ดาวที่เลือกเพิ่ม Priority ให้ข้อเสนอของบริษัท
   const copiedPlayers=state.players.map(company=>{
     const sub=allSubs[company.id];
+    if(company.eliminated){
+      return {...company,inventory:{},activeContracts:[]};
+    }
     const baseUnit=GameData.getUnit(
       Number(sub.quality||0),
       Number(sub.priceStrategy||100),
@@ -6744,8 +7787,31 @@ submitRound = async function(){
     };
   });
 
-  // ขั้นที่สอง: บริษัททั้งหมดแข่งขันพร้อมกันใน Pool กลางของทั้งจักรวาล
-  const resolved=GameData.resolveRound(copiedPlayers,allSubs,state.currentEvent);
+  // ขั้นที่สอง: คำนวณค่าเฉลี่ย Demand ของดาวที่ทุกบริษัทเลือก
+  // ต่ำกว่า 50% = ×0.90 / 50–74% = ×1.25 / 75% ขึ้นไป = ×1.50
+
+  const allPlanetMultipliers=Object.values(allSubs).map(sub=>{
+    const demand=v2DemandPercent(sub.location);
+
+    if(demand < 50) return 0.90;
+    if(demand < 75) return 1.25;
+    return 1.50;
+  });
+
+  const averagePlanetPoolMult=
+    allPlanetMultipliers.length
+      ? allPlanetMultipliers.reduce((a,b)=>a+b,0) / allPlanetMultipliers.length
+      : 1;
+
+  // ตัวคูณ Demand ดาวเฉลี่ยทำงานร่วมกับ GLOBAL EVENT
+  const roundEventWithPlanetPool={
+    ...(state.currentEvent||{}),
+    poolMult:Number(state.currentEvent?.poolMult||1) * averagePlanetPoolMult,
+    averagePlanetPoolMult
+  };
+
+  // บริษัททั้งหมดแข่งขันพร้อมกันใน Pool กลางของทั้งจักรวาล
+  const resolved=GameData.resolveRound(copiedPlayers,allSubs,roundEventWithPlanetPool);
   const realResults=resolved.results.map(r=>{
     const location=allSubs[r.player.id]?.location;
     const transportCost=v2TransportCost(r.player,location,r.sub.production);
@@ -6821,20 +7887,60 @@ submitRound = async function(){
   });
 
   state.players=state.players.map(pl=>{
+    if(pl.eliminated) return pl;
     const r=byId.get(pl.id); if(!r) return pl;
     let funds=Number(pl.funds||0)+r.profit;
     const interest=Math.round((Number(pl.regularDebt||0)*.08)*100)/100;
     funds-=interest;
-    if(funds<0){
-      if(pl.id==='you'){
-        state.screen='bankrupt'; state.bankruptcy={interest,cash:funds+interest,debt:Number(pl.regularDebt||0)};
-      }
-      funds=0;
+
+    // PASS 120: ระบบล้มละลายใหม่
+    // เงินติดลบยังสามารถส่งหุ่นได้ แต่ถ้าติดลบ 2 ไตรมาสติดจะ Game Over
+
+    const previousStreak=Number(pl.bankruptcyStreak||0);
+    const bankruptcyStreak=funds<0 ? previousStreak+1 : 0;
+
+    if(
+      pl.id==='you' &&
+      funds<0 &&
+      bankruptcyStreak===1
+    ){
+      /* PASS 124: financialWarning ถูกประเมินหลัง Result ของไตรมาส */
+      state.financialWarning={
+        interest,
+        cash:funds,
+        debt:Number(pl.regularDebt||0),
+        message:'สถานะการเงินเสี่ยงล้มละลาย'
+      };
     }
+
+    if(
+      pl.id==='you' &&
+      bankruptcyStreak>=2
+    ){
+      state.screen='bankrupt';
+      const frozenScore=v2BankruptcyFinalScore({...pl,funds});
+      pl.eliminated=true;
+      pl.bankruptRound=state.round;
+      pl.frozenScore=frozenScore;
+      state.bankruptcy={
+        interest,
+        cash:funds,
+        debt:Number(pl.regularDebt||0),
+        finalScore:frozenScore,
+        round:state.round,
+        reason:'ขาดสภาพคล่องติดต่อกัน 2 ไตรมาส'
+      };
+    }
+
     let repDelta=r.repDelta||0;
     const oldSlots=v2BaseSlots(pl.capacity);
     const newCapacity=Math.min(GameData.MAX_CAPACITY,Math.max(1,(pl.capacity||27)+Math.round((r.sub.factoryInvest||0)/GameData.EXPANSION_COST_PER_UNIT)));
-    const updated={...pl,inventory:r.endingInventory||{},funds:Math.round(funds),debt:Number(pl.regularDebt||0),reputation:Math.round(clamp(Number(pl.reputation||0)+repDelta,0,100)*10)/10,capacity:newCapacity,activeContracts:(pl.activeContracts||[]).map(c=>({...c,remaining:Math.max(0,Number(c.remaining||0)-1)})).filter(c=>c.remaining>0)};
+    const updated={...pl,
+      inventory:r.endingInventory||{},
+      funds:Math.round(funds),
+      bankruptcyStreak,
+      debt:Number(pl.regularDebt||0),
+      reputation:Math.round(clamp(Number(pl.reputation||0)+repDelta,0,100)*10)/10,capacity:newCapacity,activeContracts:(pl.activeContracts||[]).map(c=>({...c,remaining:Math.max(0,Number(c.remaining||0)-1)})).filter(c=>c.remaining>0)};
     if(v2BaseSlots(newCapacity)>oldSlots) updated.baseSlotReadyRound=state.round+1;
     return updated;
   });
@@ -6847,7 +7953,26 @@ submitRound = async function(){
     me().v2RevealSpecialNextRound=true;
   }
   state.lastReport={event:state.currentEvent,results:mapped};
-  state.history.push(state.lastReport); state.phase='report'; save(); render();
+  state.history.push(state.lastReport);
+  state.phase='report';
+  save();
+  render();
+
+  // PASS 126: แสดงคำเตือนหลังหน้า Result ถูกวาดเสร็จ
+  if(state.financialWarning){
+    const warning={...state.financialWarning};
+    state.financialWarning=null;
+    save();
+
+    await v2ShowModal({
+      tone:'red',
+      icon:'⚠️',
+      title:'สถานะการเงินเสี่ยงล้มละลาย',
+      message:'หลังจากสรุปผลการขายและหักดอกเบี้ยแล้ว บริษัทของคุณมีเงินคงเหลือติดลบ',
+      detail:'หากเงินคงเหลือติดลบหลังจบไตรมาสติดต่อกันอีก 1 ครั้ง บริษัทจะออกจากตลาดทันที',
+      confirmText:'รับทราบ'
+    });
+  }
 };
 
 nextQuarter = function(){
@@ -6855,6 +7980,7 @@ nextQuarter = function(){
   if(state.round>=12){state.screen='end'; save(); render(); return;}
   state.round++;
   state.players.forEach(p=>{
+    if(p.eliminated) return;
     p.rp=Math.round((p.rp||0)+12);
     if(p.v2RevealSpecialNextRound){p.v2SpecialRevealed=true;p.v2RevealSpecialNextRound=false;if(!p.v2SpecialNoticeShown)p.v2SpecialRevealNotice=true;}
     v2ProcessBaseBuilds(p);
@@ -6898,9 +8024,16 @@ renderEnd = function(){
     const completeBonus=complete?200:0;
     const debt=Number(p.regularDebt||0);
     const parts={cash:p.funds,rep:p.reputation*20,factory:p.capacity*(GameData.EXPANSION_COST_PER_UNIT*.5),tech:[...unlocked].length*40,rp:(p.rp||0)*.5,baseBonus,tierBonus,completeBonus,debt};
-    return {...p,parts,score:Object.values(parts).slice(0,-1).reduce((a,b)=>a+b,0)-debt};
+    const liveScore=Object.values(parts).slice(0,-1).reduce((a,b)=>a+b,0)-debt;
+    return {
+      ...p,
+      parts,
+      score:p.eliminated && Number.isFinite(Number(p.frozenScore))
+        ? Number(p.frozenScore)
+        : liveScore
+    };
   }).sort((a,b)=>b.score-a.score);
-  app.innerHTML=`<main class="phone end-phone">${topHTML()}<section class="pages"><div class="page end-page"><div class="page-body"><div class="card news"><div class="section-title"><span class="text">Final Ranking</span><span class="badge">END</span></div><div class="news-lines" style="padding:var(--sp-2) var(--sp-3) var(--sp-3)">${ranks.map((p,i)=>`<div class="news-line"><b>#${i+1} ${esc(p.name)}</b> · Score ${fmt(Math.round(p.score))}</div>`).join('')}</div></div>${ranks.filter(p=>p.id==='you').map(p=>`<div class="card news"><div class="section-title"><span class="text">คะแนนของคุณมาจาก</span></div><div class="news-lines" style="padding:var(--sp-2) var(--sp-3) var(--sp-3)">
+  app.innerHTML=`<main class="phone end-phone">${topHTML()}<section class="pages"><div class="page end-page"><div class="page-body"><div class="card news"><div class="section-title"><span class="text">Final Ranking</span><span class="badge">END</span></div><div class="news-lines" style="padding:var(--sp-2) var(--sp-3) var(--sp-3)">${ranks.map((p,i)=>`<div class="news-line"><b>#${i+1} ${esc(p.name)}</b> · Score ${fmt(Math.round(p.score))}${p.eliminated?` · <span class="red">ออกจากตลาด Q${p.bankruptRound||'?'}</span>`:''}</div>`).join('')}</div></div>${ranks.filter(p=>p.id==='you').map(p=>`<div class="card news"><div class="section-title"><span class="text">คะแนนของคุณมาจาก</span></div><div class="news-lines" style="padding:var(--sp-2) var(--sp-3) var(--sp-3)">
     <div class="news-line">เงินสด +${fmt(p.parts.cash)}</div><div class="news-line">Brand +${fmt(p.parts.rep)}</div><div class="news-line">โรงงาน +${fmt(p.parts.factory)}</div><div class="news-line">Tech Tree +${fmt(p.parts.tech)}</div><div class="news-line">Research Point เหลือ +${fmt(p.parts.rp)}</div><div class="news-line">โบนัสฐาน +${fmt(p.parts.baseBonus)}</div><div class="news-line">โบนัส Tier 3 +${fmt(p.parts.tierBonus)}</div><div class="news-line">โบนัสครบทุกสาย +${fmt(p.parts.completeBonus)}</div><div class="news-line red">หนี้ −${fmt(p.parts.debt)}</div>
   </div></div>`).join('')}</div><div class="actions single"><button id="resetGame" class="btn btn-primary">เริ่มเกมใหม่</button></div></div></section></main>`; bindCommon();
 };
@@ -6979,12 +8112,21 @@ bindCommon = function(){
   });
 
   if(state.decision.unitId==='eya-01'){
-    state.decision.quality=100;
+    state.decision.quality=Math.max(70,Number(state.decision.quality||0));
     document.querySelectorAll('[data-slider="quality"]').forEach(el=>{
-      el.value=100;
-      el.disabled=true;
+      el.min=70;
+      el.value=state.decision.quality;
+      el.disabled=false;
     });
   }
+
+
+  document.querySelectorAll('[data-gacha-popup-close]').forEach(btn=>btn.onclick=()=>{
+    state.decision.gachaPopupOpen=false;
+    AudioEngine.sfx('select');
+    save();
+    render();
+  });
 
   document.querySelectorAll('[data-gacha-pull]').forEach(btn=>btn.onclick=async()=>{
     const p=me();
@@ -7008,7 +8150,7 @@ bindCommon = function(){
     AudioEngine.sfx('select');
     await new Promise(r=>setTimeout(r,720));
 
-    const secret=Math.random()<0.40;
+    const secret=Math.random()<0.50;
     const pool=GameData.UNIT_TYPES.filter(u=>u.id!=='eya-01' && u.id!=='ball-kai');
     const u=secret?v2Unit('eya-01'):pool[Math.floor(Math.random()*pool.length)];
     const duplicate=v2Unlocked(p).has(u.id);
@@ -7018,6 +8160,7 @@ bindCommon = function(){
     }
     const result={id:u.id,duplicate,round:state.round};
     state.decision.gachaResult=result;
+    state.decision.gachaPopupOpen=true;
     p.v2GachaHistory.push(result);
     save();
     render();
@@ -7963,6 +9106,259 @@ v2style.textContent=`
 .v2-unit-row{grid-template-columns:repeat(5,1fr)}
 @media(max-width:370px){.v2-tech-row{grid-template-columns:44px 1fr 8px 1fr 8px 1fr}.v2-planet-grid{grid-template-columns:1fr 1fr}}
 
+
+/* ===== PASS 148 : GACHA RESULT POPUP ===== */
+.v2-gacha-popup-backdrop{
+  position:fixed;
+  inset:0;
+  z-index:260;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+  background:rgba(0,0,0,.78);
+  backdrop-filter:blur(9px);
+  animation:v2GachaBackdropIn .2s ease-out both;
+}
+
+.v2-gacha-popup{
+  position:relative;
+  width:min(360px,94vw);
+  min-height:430px;
+  overflow:hidden;
+  border-radius:24px;
+  border:1px solid rgba(95,195,255,.48);
+  background:
+    radial-gradient(circle at 50% 28%,rgba(95,195,255,.20),transparent 34%),
+    linear-gradient(180deg,#10263a,#07111c);
+  box-shadow:
+    0 28px 90px rgba(0,0,0,.72),
+    0 0 30px rgba(95,195,255,.18);
+  animation:v2GachaPopupIn .38s cubic-bezier(.2,.9,.25,1) both;
+}
+
+.v2-gacha-popup.secret{
+  border-color:rgba(255,216,79,.78);
+  box-shadow:
+    0 28px 90px rgba(0,0,0,.72),
+    0 0 42px rgba(255,216,79,.28);
+}
+
+.v2-gacha-popup::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:repeating-linear-gradient(
+    180deg,
+    rgba(255,255,255,.025) 0,
+    rgba(255,255,255,.025) 2px,
+    transparent 2px,
+    transparent 6px
+  );
+}
+
+.v2-gacha-light{
+  position:absolute;
+  left:50%;
+  top:42%;
+  width:520px;
+  height:46px;
+  transform-origin:center;
+  background:linear-gradient(90deg,transparent,rgba(124,220,255,.34),transparent);
+  filter:blur(5px);
+  opacity:0;
+  pointer-events:none;
+  animation:v2GachaBeam 1.4s ease-out .1s both;
+}
+.v2-gacha-light.light-a{transform:translate(-50%,-50%) rotate(22deg)}
+.v2-gacha-light.light-b{transform:translate(-50%,-50%) rotate(-22deg);animation-delay:.18s}
+
+.v2-gacha-popup.secret .v2-gacha-light{
+  background:linear-gradient(90deg,transparent,rgba(255,223,103,.46),transparent);
+}
+
+.v2-gacha-flare{
+  position:absolute;
+  left:50%;
+  top:40%;
+  width:28px;
+  height:28px;
+  border-radius:50%;
+  transform:translate(-50%,-50%);
+  background:#dff8ff;
+  box-shadow:0 0 22px 10px rgba(105,215,255,.65),0 0 70px 26px rgba(105,215,255,.25);
+  opacity:0;
+  animation:v2GachaFlare 1s ease-out .28s both;
+}
+.v2-gacha-popup.secret .v2-gacha-flare{
+  background:#fff5b0;
+  box-shadow:0 0 24px 10px rgba(255,216,79,.75),0 0 80px 30px rgba(255,216,79,.30);
+}
+
+.v2-gacha-secret-banner{
+  position:absolute;
+  inset:0;
+  z-index:6;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#fff1a1;
+  font-size:26px;
+  font-weight:1000;
+  letter-spacing:3px;
+  text-shadow:0 0 10px rgba(255,216,79,.95),0 0 28px rgba(255,216,79,.62);
+  background:rgba(3,8,14,.80);
+  animation:v2SecretUnitSequence 1.75s ease both;
+  pointer-events:none;
+}
+
+.v2-gacha-popup-content{
+  position:relative;
+  z-index:4;
+  min-height:430px;
+  padding:26px 22px 20px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
+  opacity:0;
+  transform:scale(.88);
+  animation:v2GachaContentReveal .48s cubic-bezier(.2,.9,.25,1) .72s forwards;
+}
+.v2-gacha-popup.secret .v2-gacha-popup-content{
+  animation-delay:1.65s;
+}
+
+.v2-gacha-popup-kicker{
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:2px;
+  color:var(--blue);
+}
+.v2-gacha-popup.secret .v2-gacha-popup-kicker{color:var(--gold)}
+
+.v2-gacha-popup-art{
+  width:190px;
+  height:190px;
+  margin-top:14px;
+  display:grid;
+  place-items:center;
+  border-radius:22px;
+  border:1px solid rgba(95,195,255,.26);
+  background:
+    radial-gradient(circle at 50% 45%,rgba(95,195,255,.24),transparent 42%),
+    linear-gradient(rgba(95,195,255,.06) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(95,195,255,.06) 1px,transparent 1px),
+    rgba(2,10,17,.72);
+  background-size:auto,12px 12px,12px 12px,auto;
+  box-shadow:inset 0 0 30px rgba(95,195,255,.08);
+}
+.v2-gacha-popup.secret .v2-gacha-popup-art{
+  border-color:rgba(255,216,79,.42);
+  background:
+    radial-gradient(circle at 50% 45%,rgba(255,216,79,.28),transparent 43%),
+    linear-gradient(rgba(255,216,79,.055) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,216,79,.055) 1px,transparent 1px),
+    rgba(12,10,3,.72);
+  background-size:auto,12px 12px,12px 12px,auto;
+}
+
+.v2-gacha-popup-art .mech{
+  width:150px;
+  height:150px;
+  image-rendering:pixelated;
+  filter:drop-shadow(0 0 12px rgba(95,195,255,.42));
+  animation:v2GachaUnitFloat 2.2s ease-in-out infinite;
+}
+.v2-gacha-popup.secret .v2-gacha-popup-art .mech{
+  filter:drop-shadow(0 0 16px rgba(255,216,79,.52));
+}
+
+.v2-gacha-popup-name{
+  margin-top:14px;
+  font-size:24px;
+  font-weight:1000;
+  color:var(--gold);
+  line-height:1;
+}
+
+.v2-gacha-popup-desc{
+  margin-top:8px;
+  min-height:28px;
+  font-size:11px;
+  line-height:1.45;
+  color:var(--muted);
+}
+
+.v2-gacha-popup-tags{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:5px;
+  margin-top:10px;
+}
+.v2-gacha-popup-tags i{
+  font-style:normal;
+  font-size:8px;
+  padding:4px 6px;
+  border:1px solid var(--line-strong);
+  border-radius:999px;
+}
+
+.v2-gacha-popup-close{
+  width:100%;
+  min-height:42px;
+  margin-top:auto;
+  border-radius:11px;
+  background:linear-gradient(180deg,#ffe066,#e2a72a);
+  color:#241a02;
+  font-size:14px;
+  font-weight:1000;
+  box-shadow:0 4px 14px rgba(226,167,42,.35);
+}
+
+@keyframes v2GachaBackdropIn{
+  from{opacity:0}
+  to{opacity:1}
+}
+@keyframes v2GachaPopupIn{
+  from{opacity:0;transform:translateY(22px) scale(.94)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+@keyframes v2GachaBeam{
+  0%{opacity:0;width:20px}
+  35%{opacity:1}
+  100%{opacity:0;width:520px}
+}
+@keyframes v2GachaFlare{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.15)}
+  35%{opacity:1}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(4.5)}
+}
+@keyframes v2GachaContentReveal{
+  from{opacity:0;transform:scale(.86);filter:blur(8px)}
+  to{opacity:1;transform:scale(1);filter:blur(0)}
+}
+@keyframes v2SecretUnitSequence{
+  0%{opacity:0;letter-spacing:10px;filter:blur(8px)}
+  18%,68%{opacity:1;letter-spacing:3px;filter:blur(0)}
+  100%{opacity:0;transform:scale(1.08)}
+}
+@keyframes v2GachaUnitFloat{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-5px)}
+}
+
+@media(max-height:700px){
+  .v2-gacha-popup{min-height:390px}
+  .v2-gacha-popup-content{min-height:390px;padding:20px 18px 16px}
+  .v2-gacha-popup-art{width:160px;height:160px}
+  .v2-gacha-popup-art .mech{width:126px;height:126px}
+  .v2-gacha-popup-name{font-size:21px}
+}
+
+
 /* PASS 106: GALACTIC GACHA */
 .v2-gacha-reveal-shell{position:relative;overflow:hidden;display:flex;flex-direction:column;gap:9px}
 .v2-gacha-reveal-shell::before{content:"NEW FEATURE UNLOCK";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff4a8;font-size:13px;font-weight:1000;letter-spacing:2px;text-shadow:0 0 8px rgba(255,216,79,.9),0 0 18px rgba(255,216,79,.45);background:linear-gradient(90deg,rgba(4,12,22,.92),rgba(20,28,36,.88),rgba(4,12,22,.92));z-index:20;opacity:0;animation:v2SecretBannerIn .22s ease forwards,v2SecretBannerOut .28s ease 1s forwards;pointer-events:none}
@@ -8032,6 +9428,38 @@ v2style.textContent=`
 }
 `;
 document.head.appendChild(v2style);
+
+
+// PASS 133: BANKRUPTCY ACTIONS — อยู่ใน scope เดียวกับ state/save/render
+window.mspcContinueAfterBankruptcy = async function(){
+  if(state.autoSimulatingAfterBankruptcy) return;
+  state.autoSimulatingAfterBankruptcy=true;
+  state.screen='game';
+  save();
+
+  try{
+    while(state.round<12){
+      nextQuarter();
+      await submitRound();
+    }
+    state.screen='end';
+    state.phase='report';
+    save();
+    render();
+  }finally{
+    state.autoSimulatingAfterBankruptcy=false;
+  }
+};
+
+window.mspcRestartAfterBankruptcy = function(){
+  // ใช้ hard reset เดิมของเกม เพื่อเคลียร์ save และกลับหน้าเริ่มบริษัท
+  if(typeof v2HardResetGame==='function'){
+    v2HardResetGame();
+    return;
+  }
+  safeStorage.removeItem(KEY);
+  location.reload();
+};
 
 load(); v2EnsureState(); render();
 })();
