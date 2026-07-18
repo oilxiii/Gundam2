@@ -1,3 +1,44 @@
+<!-- PASS 187: STARTING FUNDS 500
+- ปรับเงินเริ่มต้นของผู้เล่นและ AI จาก 600 Cr. เป็น 500 Cr.
+-->
+<!-- PASS 186: FACTORY INVESTMENT EFFECT FIX
+- แก้ให้การลงทุนโรงงาน 100% เพิ่ม Capacity เท่าระบบเดิม 100 Cr.
+- ค่าแถบ 0–100% ใช้เป็นพลังการลงทุน 0–100 หน่วย
+- หักเงินจริงเพียงครึ่งหนึ่ง: 100% = 50 Cr.
+- แก้ทั้งค่าพรีวิว, การหักเงิน และผลเพิ่ม Capacity
+-->
+<!-- PASS 185: FACTORY SLIDER FIX
+- แก้บั๊กแถบขยายโรงงานเด้งกลับเป็น 0%
+- แยกค่าเปอร์เซ็นต์บน UI ออกจากค่าเงินจริงที่ใช้คำนวณ
+- ไม่เขียนทับค่า factoryInvest ใน state อีกต่อไป
+-->
+<!-- PASS 184: INVESTMENT PERCENT SCALE
+- แถบโฆษณาและขยายโรงงานแสดงเป็น 0% / 25% / 50% / 75% / 100%
+- ขยายโรงงาน 100% ใช้เงินจริง 50 Cr. และเพิ่ม Capacity เท่ากับระบบเดิมที่จ่าย 100 Cr.
+- จำกัดการลงทุนโรงงานของผู้เล่น, AI และค่าเซฟให้อยู่ในช่วง 0–100%
+-->
+<!-- PASS 183: ECONOMY REBALANCE
+- โฆษณา 100 แต้ม ใช้เงินจริงสูงสุด 50 Cr. แต่ Appeal x2 และ Brand +4 เท่าเดิม
+- ขยายโรงงานใช้ต้นทุนครึ่งหนึ่ง แต่ได้ Capacity เท่าเดิม
+- Galactic Gacha ลดเหลือ 150 Cr.
+- EYA-01 ลดเหลือ CP 6
+-->
+<!-- PASS 182: BASE BUILD AUTO LOAN
+- ถ้าเงินสร้างฐานไม่พอ จะเปิด Popup เงินกู้เดิมทันที
+- เมื่อผู้เล่นกดรับเงินกู้ ระบบรับเงินกู้และสร้างฐานต่อให้อัตโนมัติ
+- แก้ตัวแปรเงินสร้างฐานให้ใช้ funds ซึ่งเป็นเงินสดจริงของเกม
+-->
+<!-- PASS 180: THEMED BASE BUILD CONFIRMATION
+- เลือกดาวก่อน แล้วกดยืนยันและจ่าย 100 Cr. ภายใน popup เดิม
+- ปุ่มยังก่อนปิด popup เฉพาะไตรมาสปัจจุบัน และจะกลับมาใหม่ในไตรมาสถัดไป
+- ยกเลิก confirm() ของเบราว์เซอร์
+-->
+<!-- PASS 178: EYA-01 PRIORITY WORKING
+- เพิ่ม bestAppeal ให้ระดับ Family และ Variant
+- ใช้ค่า appeal ที่รวม Priority โบนัสของ EYA-01 แล้ว
+- EYA-01 Priority +20 ส่งผลต่อการแย่ง Demand จริง
+- ไม่เปลี่ยนกำลังผลิต ราคา ต้นทุน หรือโบนัสรายได้ +10%
+-->
 <!-- PASS175_EYA_PRIORITY_FIX -->
 <!-- PASS 166: GACHA 80% + NO DUPLICATES
 - เอาแท็ก EYA-01 50% ออกจากการ์ด Galactic Gacha
@@ -1055,6 +1096,47 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
 .base-choice-planet.building .base-choice-cost{
   color:#ffe08a;
 }
+.base-choice-planet.selected{
+  border-color:var(--gold);
+  background:rgba(255,216,79,.13);
+  box-shadow:0 0 0 2px rgba(255,216,79,.14) inset,0 0 18px rgba(255,216,79,.12);
+  color:#fff6c7;
+}
+.base-choice-planet.selected .base-choice-name{
+  color:var(--gold);
+}
+.base-choice-actions{
+  position:sticky;
+  bottom:0;
+  z-index:2;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,1.45fr);
+  gap:8px;
+  padding:10px;
+  background:linear-gradient(180deg,rgba(18,29,45,.55),#121d2d 32%);
+  border-top:1px solid rgba(255,255,255,.08);
+}
+.base-choice-actions .btn{
+  height:42px;
+  font-size:12px;
+}
+.base-choice-actions .btn:disabled{
+  opacity:.42;
+  cursor:not-allowed;
+  filter:saturate(.45);
+  box-shadow:none;
+}
+.base-choice-selection{
+  padding:0 12px 8px;
+  min-height:24px;
+  color:var(--muted);
+  font-size:11px;
+  text-align:center;
+}
+.base-choice-selection b{
+  color:var(--gold);
+}
+
 @keyframes baseChoiceSpin{
   to{transform:rotate(405deg)}
 }
@@ -4559,7 +4641,7 @@ section.page.cmd.command-locked .actions{
     { id:'zagu-red', tier:1, branch:'special', special:true, cpCost:2, baseCost:8.0, basePrice:12.5, rnd:'mid', price:'mid', name:'Zagu Red', tag:'ว่ากันว่าเร็วกว่ารุ่นปกติสามเท่า แม้ไม่มีใครพิสูจน์ได้', sprite:'zaguRed' },
     { id:'gold-rx', tier:2, branch:'special', special:true, cpCost:3, baseCost:14.0, basePrice:21.0, rnd:'high', price:'high', name:'Gold RX', tag:'หุ่นสีทอง เป้ายิงที่โดดเด่นกลางสนามรบ', sprite:'goldRx' },
     { id:'magz', tier:3, branch:'special', special:true, cpCost:4, baseCost:25.0, basePrice:39.0, rnd:'high', price:'high', name:'MagZ', tag:'ซูเปอร์โรบอตปริศนาที่หลายคนตั้งคำถามว่า “มาได้ไงวะ?”', sprite:'magz' },
-    { id:'eya-01', tier:3, branch:'special', special:true, secret:true, cpCost:10, baseCost:25.0, basePrice:39.0, rnd:'high', price:'high', name:'EYA-01', tag:'หุ่นยนต์คุณภาพที่พร้อมเปลี่ยนคนขับให้เป็นน้ำส้ม', sprite:'eya01' },
+    { id:'eya-01', tier:3, branch:'special', special:true, secret:true, cpCost:6, baseCost:25.0, basePrice:39.0, rnd:'high', price:'high', name:'EYA-01', tag:'หุ่นยนต์คุณภาพที่พร้อมเปลี่ยนคนขับให้เป็นน้ำส้ม', sprite:'eya01' },
   ];
 
   const TECH_TIERS = [
@@ -4793,7 +4875,8 @@ section.page.cmd.command-locked .actions{
     return Math.max(0, (MAX_CAPACITY - capacity) * EXPANSION_COST_PER_UNIT);
   }
   function effectiveFactoryInvestment(player, amount) {
-    return Math.min(Math.max(0, Number(amount || 0)), maxUsefulFactoryInvestment(player));
+    const percent = clamp(Number(amount || 0), 0, 100);
+    return Math.min(percent, maxUsefulFactoryInvestment(player));
   }
   function effectiveRndInvestment(player, amount) {
     return nextTechTier(player || {}) ? Math.max(0, Number(amount || 0)) : 0;
@@ -4986,6 +5069,7 @@ section.page.cmd.command-locked .actions{
       if (spareCash-rndInvest > (difficulty==='hard'?320:420) && cap < MAX_CAPACITY && Math.random()<factoryChance) factoryInvest=Math.round(clamp((spareCash-rndInvest)*(difficulty==='hard'?0.13:0.10),0,100));
     }
     lobby = clamp(Number(lobby || 0), 0, 100);
+    factoryInvest = clamp(Number(factoryInvest || 0), 0, 100);
     return { unitId:unit.id, quality, priceStrategy, prodPct, production, lobby, factoryInvest, rndInvest };
   }
   function pickMarketEvent() {
@@ -5073,7 +5157,7 @@ section.page.cmd.command-locked .actions{
       const priceAppeal = priceAppealFromMarket(econ.unitPrice, referencePrice);
       const purchaseAcceptance = purchaseAcceptanceFromMarket(econ.unitPrice, referencePrice);
       const reputationBoost = 1 + (clamp(Number(p.reputation || 0), 0, 100) / 100) * 0.50;
-      const adBoost = 1 + (actualLobby / 100) * 0.20;
+      const adBoost = 1 + (actualLobby / 100) * 1.00;
 
       // Offer Appeal ใช้แข่งระหว่างบริษัทและช่วยดึง Demand ข้าม Variant
       // จำนวนบริษัทใน Variant เดียวกันจะไม่ถูกนำมาบวกเพื่อขยายตลาดของ Variant
@@ -5171,7 +5255,9 @@ section.page.cmd.command-locked .actions{
         variantPriority: Math.max(...sellers.map(r => Number(r.variantPriority || 1))),
         // ใช้ข้อเสนอที่ดีที่สุดเป็นหน้าตาของ Variant
         // จึงไม่เกิดปัญหา 7 บริษัท Ball รวมคะแนนทับ Ball Kai บริษัทเดียว
-        bestOfferAppeal: Math.max(...sellers.map(r => Number(r.offerAppeal || 0.0001)))
+        bestOfferAppeal: Math.max(...sellers.map(r => Number(r.offerAppeal || 0.0001))),
+        // คะแนนเต็มรวม Priority ของหุ่น, ข่าวดาว, Event และ EYA-01 +20
+        bestAppeal: Math.max(...sellers.map(r => Number(r.appeal || 0.0001)))
       }));
 
       return allocateWeighted(
@@ -5205,7 +5291,9 @@ section.page.cmd.command-locked .actions{
         sellers,
         familyPriority: Math.max(...sellers.map(r => Number(r.familyPriority || 1))),
         // Family ใช้ข้อเสนอที่ดีที่สุด ไม่ใช้ผลรวมจำนวนบริษัท
-        bestOfferAppeal: Math.max(...sellers.map(r => Number(r.offerAppeal || 0.0001)))
+        bestOfferAppeal: Math.max(...sellers.map(r => Number(r.offerAppeal || 0.0001))),
+        // คะแนนเต็มรวม Priority ของหุ่น, ข่าวดาว, Event และ EYA-01 +20
+        bestAppeal: Math.max(...sellers.map(r => Number(r.appeal || 0.0001)))
       }));
 
       return allocateWeighted(
@@ -5337,8 +5425,8 @@ section.page.cmd.command-locked .actions{
       const perfTriggered = unitsSold > 0 && Math.random() < perfChance;
       const performanceBonus = perfTriggered ? Math.round(revenue * (0.05 + Math.random()*0.10)) : 0;
       const actualLobby = clamp(Number(r.sub.lobby || 0), 0, 100);
-      const lobbyCost = hasFreeAdvertisingContract(r.player) ? 0 : actualLobby;
-      const factoryCost = hasFreeFactoryContract(r.player) ? 0 : Number(r.sub.factoryInvest || 0);
+      const lobbyCost = hasFreeAdvertisingContract(r.player) ? 0 : actualLobby / 2;
+      const factoryCost = hasFreeFactoryContract(r.player) ? 0 : Number(r.sub.factoryInvest || 0) / 2;
       const cost = productionCost + lobbyCost + factoryCost + (r.sub.rndInvest || 0) + holding.cost;
       const profit = revenue + performanceBonus - cost;
       return {
@@ -6285,14 +6373,13 @@ function currentCalc(){
   normalizeUnit(); const p=me(), d=state.decision;
   if(d.unitId==='eya-01') d.quality=Math.max(70,Number(d.quality||0));
   d.lobby=clamp(Number(d.lobby||0),0,100);
-  d.factoryInvest=GameData.effectiveFactoryInvestment(p,d.factoryInvest);
   d.rndInvest=0;
   const base=GameData.getUnit(d.quality,d.priceStrategy,d.unitId,p), unit=GameData.qualityVariant(base,d.quality);
   const prod=plannedUnits(p,d), cpUse=prod*Math.max(1,base.cpCost||1), econ=GameData.unitEconomics(d.quality,d.priceStrategy,state.currentEvent?.costMult||1,d.prodPct,prod,base.id,p);
   const factoryInvest=GameData.effectiveFactoryInvestment(p,d.factoryInvest);
   const rndInvest=GameData.effectiveRndInvestment(p,d.rndInvest);
-  const lobbyCost=GameData.hasFreeAdvertisingContract(p)?0:Number(d.lobby||0);
-  const factoryCost=GameData.hasFreeFactoryContract(p)?0:factoryInvest;
+  const lobbyCost=GameData.hasFreeAdvertisingContract(p)?0:Number(d.lobby||0)/2;
+  const factoryCost=GameData.hasFreeFactoryContract(p)?0:factoryInvest/2;
   const upfront=Math.round((prod*econ.unitCost+lobbyCost+factoryCost+rndInvest)*10)/10;
   const estimatedHolding=Math.round(GameData.inventoryHoldingCost(p).cost*10)/10;
   const estimatedTotal=Math.round((upfront+estimatedHolding)*10)/10;
@@ -6627,7 +6714,7 @@ function renderCommand(){
                 <div class="v2-invest-value ${levelUp?'level-up':''} ${key==='lobby'&&Number(state.decision.lobby||0)>0?'brand-active':''}" ${key==='factoryInvest'?`data-factory-display data-current-factory-level="${factoryLv}"`:key==='lobby'?'data-brand-display':''}>${status}</div>
                 <div class="v2-slider-shell">
                   <div class="v2-scale-labels">
-                    <span>100</span><span>75</span><span>50</span><span>25</span><span>0</span>
+                    <span>100%</span><span>75%</span><span>50%</span><span>25%</span><span>0%</span>
                   </div>
                   <div class="v2-fader-rail">
                     <input
@@ -8230,13 +8317,13 @@ function v2RenderGacha(player){
   const unlockedNow=v2Unlocked(player);
   const availableGachaUnits=GameData.UNIT_TYPES.filter(u=>u.id!=='ball-kai' && !unlockedNow.has(u.id));
   const hasAvailable=availableGachaUnits.length>0;
-  const canPay=Number(player.funds||0)>=200 && hasAvailable;
+  const canPay=Number(player.funds||0)>=150 && hasAvailable;
   const gachaCard=`<section class="card v2-gacha-card">
       <div class="v2-gacha-copy">
         <div class="v2-gacha-title">GALACTIC GACHA</div>
         <p>ลุ้นกาชาปลดล็อกหุ่นโดยไม่ใช้ค่า RP<br>การสุ่มจะไม่ออกหุ่นที่คุณมีอยู่แล้ว</p>
-        <div class="v2-gacha-rules"><span>200 Cr / ครั้ง</span></div>
-        <button class="v2-gacha-btn" data-gacha-pull ${canPay?'':'disabled'}>${hasAvailable?(canPay?'สุ่ม 1 ครั้ง · 200 Cr':'เงินไม่พอ'):'สะสมครบทุกตัวแล้ว'}</button>
+        <div class="v2-gacha-rules"><span>150 Cr / ครั้ง</span></div>
+        <button class="v2-gacha-btn" data-gacha-pull ${canPay?'':'disabled'}>${hasAvailable?(canPay?'สุ่ม 1 ครั้ง · 150 Cr':'เงินไม่พอ'):'สะสมครบทุกตัวแล้ว'}</button>
       </div>
       <div class="v2-gacha-machine" aria-hidden="true">
         <div class="v2-gacha-machine-sign">GACHA</div>
@@ -8367,7 +8454,8 @@ function renderLocation(){
     </button>`;
   }).join('');
 
-  const buildOptions=!resolved&&slots>0
+  const baseChoiceDeferredThisRound=Number(p.baseChoiceDeferredRound||0)===Number(state.round||0);
+  const buildOptions=!resolved&&slots>0&&!baseChoiceDeferredThisRound
     ? V2_PLANETS.map(pl=>{
         const home=pl.id===p.homePlanet;
         const owned=home||(p.bases||[]).includes(pl.id);
@@ -8378,7 +8466,7 @@ function renderLocation(){
 
         return `<button class="base-choice-planet ${owned?'owned':''} ${building?'building':''}"
           ${disabled?'disabled':''}
-          ${disabled?'':`data-build-base="${pl.id}"`}>
+          ${disabled?'':`data-base-choice="${pl.id}"`}>
           <div class="base-choice-planet-art">${v2PlanetArt(pl.id)}</div>
           <span class="base-choice-name">${esc(pl.name)}</span>
           <small class="base-choice-cost">${transport?`ค่าขนส่ง ${fmt(transport)} Cr.`:'ค่าขนส่ง 0 Cr.'}</small>
@@ -8442,10 +8530,22 @@ function renderLocation(){
           </div>
 
           <div class="base-choice-required">
-            กรุณาเลือกดาว 1 ดวงเพื่อขยายสายการผลิต
+            กรุณาเลือกดาว 1 ดวงเพื่อขยายสายการผลิต<br>
+            <span style="color:var(--gold)">ค่าก่อสร้างฐาน 100 Cr.</span>
           </div>
 
           <div class="base-choice-planets">${buildOptions}</div>
+
+          <div class="base-choice-selection" id="baseChoiceSelection">
+            เลือกดาวที่ต้องการสร้างฐาน
+          </div>
+
+          <div class="base-choice-actions">
+            <button class="btn btn-secondary" id="deferBaseBuild">ยังก่อน</button>
+            <button class="btn btn-primary" id="confirmBaseBuild" disabled>
+              ยืนยันและจ่าย 100 Cr.
+            </button>
+          </div>
         </div>
       </div>`:''}
 
@@ -9039,14 +9139,14 @@ bindCommon = function(){
     const ok=await v2ShowModal({
       tone:'gold',
       title:'Galactic Gacha',
-      message:'ใช้ 200 Cr เพื่อสุ่มพิมพ์เขียน 1 ครั้งหรือไม่?',
+      message:'ใช้ 150 Cr เพื่อสุ่มพิมพ์เขียน 1 ครั้งหรือไม่?',
       detail:'ระบบจะสุ่มเฉพาะหุ่นที่คุณยังไม่มี',
       warning:'ไม่มีการคืนเงินหลังยืนยันการสุ่ม',
       confirmText:'สุ่มเลย',
       cancelText:'ยังก่อน'
     });
     if(!ok) return;
-    p.funds-=200;
+    p.funds-=150;
     p.v2GachaPulls=Number(p.v2GachaPulls||0)+1;
     const machine=document.querySelector('.v2-gacha-machine');
     const win=document.querySelector('.v2-gacha-window');
@@ -9129,14 +9229,98 @@ bindCommon = function(){
       summaryProfit.classList.toggle('paid',netPerUnit<0);
     }
   });
-  document.querySelectorAll('[data-build-base]').forEach(btn=>btn.onclick=async()=>{
-    const p=me(),pid=btn.dataset.buildBase;
-    if(v2AvailableBaseSlot(p)<=0 || Number(p.baseSlotReadyRound||0)>state.round){
-      await v2ShowModal({tone:'blue',title:'ยังตั้งฐานไม่ได้',message:'สิทธิ์ตั้งฐานยังไม่พร้อมใช้งาน',confirmText:'รับทราบ'});
+  let selectedBasePlanetId='';
+
+  document.querySelectorAll('[data-base-choice]').forEach(btn=>btn.onclick=()=>{
+    selectedBasePlanetId=btn.dataset.baseChoice||'';
+
+    document.querySelectorAll('[data-base-choice]').forEach(card=>{
+      card.classList.toggle('selected',card===btn);
+    });
+
+    const selection=document.querySelector('#baseChoiceSelection');
+    if(selection){
+      selection.innerHTML=`ฐานใหม่: <b>${esc(v2Planet(selectedBasePlanetId).name)}</b> · ค่าใช้จ่าย 100 Cr.`;
+    }
+
+    const confirmBtn=document.querySelector('#confirmBaseBuild');
+    if(confirmBtn) confirmBtn.disabled=!selectedBasePlanetId;
+
+    AudioEngine.sfx('select');
+  });
+
+  const deferBaseBtn=document.querySelector('#deferBaseBuild');
+  if(deferBaseBtn) deferBaseBtn.onclick=()=>{
+    const p=me();
+    p.baseChoiceDeferredRound=state.round;
+    AudioEngine.sfx('select');
+    save();
+    render();
+  };
+
+  const confirmBaseBtn=document.querySelector('#confirmBaseBuild');
+  if(confirmBaseBtn) confirmBaseBtn.onclick=async()=>{
+    const p=me();
+    const pid=selectedBasePlanetId;
+    const BASE_BUILD_COST=100;
+
+    if(!pid){
+      AudioEngine.sfx('error');
       return;
     }
-    p.baseBuilds.push({planetId:pid,completeRound:state.round+1});AudioEngine.sfx('select');save();render();
-  });
+
+    if(v2AvailableBaseSlot(p)<=0 || Number(p.baseSlotReadyRound||0)>state.round){
+      await v2ShowModal({
+        tone:'blue',
+        title:'ยังตั้งฐานไม่ได้',
+        message:'สิทธิ์ตั้งฐานยังไม่พร้อมใช้งาน',
+        confirmText:'รับทราบ'
+      });
+      return;
+    }
+
+    const alreadyUnavailable=
+      pid===p.homePlanet ||
+      (p.bases||[]).includes(pid) ||
+      (p.baseBuilds||[]).some(b=>b.planetId===pid);
+
+    if(alreadyUnavailable){
+      await v2ShowModal({
+        tone:'blue',
+        title:'ไม่สามารถสร้างฐานได้',
+        message:'ดาวดวงนี้มีโรงงานหรือกำลังก่อสร้างอยู่แล้ว',
+        confirmText:'รับทราบ'
+      });
+      render();
+      return;
+    }
+
+    if((p.funds||0)<BASE_BUILD_COST){
+      const loanAccepted=await v2MaybeLoan(p,BASE_BUILD_COST);
+
+      if(!loanAccepted){
+        return;
+      }
+
+      if((p.funds||0)<BASE_BUILD_COST){
+        await v2ShowModal({
+          tone:'red',
+          title:'วงเงินไม่เพียงพอ',
+          message:`หลังรับเงินกู้แล้ว เงินสดยังไม่ถึง ${fmt(BASE_BUILD_COST)} Cr.`,
+          detail:`เงินสดปัจจุบัน ${fmt(p.funds||0)} Cr.`,
+          confirmText:'รับทราบ'
+        });
+        return;
+      }
+    }
+
+    p.funds-=BASE_BUILD_COST;
+    p.baseBuilds.push({planetId:pid,completeRound:state.round+1});
+    p.baseChoiceDeferredRound=0;
+    AudioEngine.sfx('select');
+    save();
+    render();
+  };
   const debtBtn=document.querySelector('#repayDebt');
   if(debtBtn) debtBtn.onclick=async()=>{
     const p=me();
