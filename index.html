@@ -1,3 +1,8 @@
+<!-- PASS 188: SINGLE PRICE PENALTY
+- ราคาใช้ลดความน่าสนใจผ่าน priceAppeal เพียงครั้งเดียว
+- ตัดการลงโทษราคาซ้ำใน purchaseAcceptance
+- เมื่อข้อเสนอชนะคำสั่งซื้อแล้ว ลูกค้าจะไม่ปฏิเสธซ้ำด้วยราคาเดิม
+-->
 <!-- PASS 187: STARTING FUNDS 500
 - ปรับเงินเริ่มต้นของผู้เล่นและ AI จาก 600 Cr. เป็น 500 Cr.
 -->
@@ -4829,13 +4834,9 @@ section.page.cmd.command-locked .actions{
   }
 
   function purchaseAcceptanceFromMarket(unitPrice, referencePrice) {
-    const actual = Math.max(0.01, Number(unitPrice || 0.01));
-    const reference = Math.max(0.01, Number(referencePrice || 1));
-    const ratio = actual / reference;
-    if (ratio <= 1) return 1;
-    let acceptance = 1 / Math.pow(ratio, 2);
-    if (ratio > 2) acceptance *= 0.5;
-    return clamp(acceptance, 0, 1);
+    // PASS 188: ราคาได้ส่งผลต่อการแข่งขันผ่าน priceAppeal แล้ว
+    // จึงไม่กรองหรือปฏิเสธคำสั่งซื้อซ้ำเป็นรอบที่สอง
+    return 1;
   }
   function qualityAppealFactor(quality = 50) {
     // Quality 50 is the baseline. Range: x0.60 at 0 to x1.40 at 100.
@@ -10656,6 +10657,285 @@ renderReport=function(){
   return _pass168RenderReport();
 };
 
+
+/* ===== PASS 190 : HALO INTEGRATION SCOPE FIX ===== */
+function haloNum(value){
+    return Number(value || 0);
+  }
+
+  function haloPercent(value){
+    return `${Math.round(haloNum(value) * 100)}%`;
+  }
+
+  function haloFmt(value){
+    const n=Math.round(haloNum(value)*10)/10;
+    return `${n.toLocaleString('en-US')} Cr.`;
+  }
+
+  function haloAnalyze(report){
+    const results=Array.isArray(report?.results) ? report.results : [];
+    const you=results.find(r=>r.playerId==='you');
+    if(!you) return null;
+
+    const samePlanet=results.filter(r=>
+      r.playerId!=='you' &&
+      r.location===you.location &&
+      haloNum(r.unitsSold)>0
+    );
+    const cheaper=samePlanet.filter(r=>haloNum(r.unitPrice)<haloNum(you.unitPrice));
+    const saleRate=haloNum(you.availableUnits)>0
+      ? haloNum(you.unitsSold)/haloNum(you.availableUnits)
+      : 0;
+    const unsold=Math.max(0,haloNum(you.availableUnits)-haloNum(you.unitsSold));
+    const priceOver=Math.max(0,(haloNum(you.priceRatio)-1)*100);
+    const priceUnder=Math.max(0,(1-haloNum(you.priceRatio))*100);
+    const locationName=typeof v2Planet==='function'
+      ? v2Planet(you.location)?.name || 'ตลาดเป้าหมาย'
+      : 'ตลาดเป้าหมาย';
+    const unitName=you.unit?.name || 'หุ่นของคุณ';
+    const history=Array.isArray(state?.history) ? state.history : [];
+    const previousProfits=history
+      .slice(0,-1)
+      .map(rep=>rep?.results?.find(r=>r.playerId==='you'))
+      .filter(Boolean)
+      .map(r=>haloNum(r.profit));
+    const bestPrevious=previousProfits.length ? Math.max(...previousProfits) : -Infinity;
+
+    const candidates=[];
+    const add=(score,data)=>candidates.push({score,...data});
+
+    if(haloNum(you.profit)<0){
+      const severity=Math.min(55,Math.abs(haloNum(you.profit)));
+      add(100+severity,{
+        tone:'danger',
+        label:'ผลกระทบสูง',
+        headline:`บริษัทขาดทุน <strong>${haloFmt(Math.abs(you.profit))}</strong> ในไตรมาสเดียว`,
+        text: unsold>0
+          ? `${unitName} เหลือขาย ${Math.round(unsold)} เครื่อง ทำให้ต้นทุนการผลิตและขนส่งไม่ถูกชดเชยด้วยรายได้`
+          : `แม้ขายสินค้าได้ แต่รายได้ยังไม่ครอบคลุมต้นทุนรวมของแผนการผลิตครั้งนี้`,
+        data:[
+          [haloFmt(you.profit),'กำไรสุทธิ'],
+          [`${Math.round(you.unitsSold)}/${Math.round(you.availableUnits)}`,'ขายได้'],
+          [haloFmt(you.cost),'ต้นทุนรวม']
+        ]
+      });
+    }
+
+    if(saleRate<.35 && haloNum(you.advertising)>=75){
+      let reason='';
+      if(priceOver>=15 && cheaper.length){
+        reason=`ราคาสูงกว่าราคากลาง ${Math.round(priceOver)}% และมีคู่แข่งที่ถูกกว่า ${cheaper.length} บริษัทใน ${locationName}`;
+      }else if(priceOver>=15){
+        reason=`ราคาสูงกว่าราคากลาง ${Math.round(priceOver)}% จนแรงโฆษณาชดเชยได้ไม่ทั้งหมด`;
+      }else if(samePlanet.length>=2){
+        reason=`มีคู่แข่งขายอยู่ใน ${locationName} พร้อมกัน ${samePlanet.length} บริษัท`;
+      }else{
+        reason=`ข้อเสนอของคู่แข่งมีความน่าสนใจมากกว่าในตลาดเดียวกัน`;
+      }
+      add(96+(1-saleRate)*20,{
+        tone:'danger',
+        label:'ผลกระทบสูง',
+        headline:`โฆษณาเต็มกำลัง แต่ <strong>${unitName} ขายได้เพียง ${Math.round(you.unitsSold)} เครื่อง</strong>`,
+        text:reason,
+        data:[
+          [`${Math.round(you.unitsSold)}/${Math.round(you.availableUnits)}`,'ยอดขาย'],
+          [`${Math.round(you.advertising)}%`,'โฆษณา'],
+          [priceOver?`+${Math.round(priceOver)}%`:`${Math.round(priceUnder)}% ต่ำกว่า`,'เทียบราคากลาง']
+        ]
+      });
+    }
+
+    if(saleRate<.35 && unsold>=5){
+      const cause=priceOver>=15
+        ? `ราคาสูงกว่าราคากลาง ${Math.round(priceOver)}% เป็นสาเหตุหลักที่ทำให้คำสั่งซื้อไหลไปยังข้อเสนออื่น`
+        : samePlanet.length>=2
+          ? `${locationName} มีคู่แข่งที่ขายได้จริงอีก ${samePlanet.length} บริษัท ทำให้คำสั่งซื้อถูกแย่งไป`
+          : `ตลาดตอบรับ ${unitName} ต่ำกว่าปริมาณที่บริษัทผลิตออกมา`;
+      add(88+(1-saleRate)*18,{
+        tone:'danger',
+        label:'ยอดขายผิดเป้า',
+        headline:`สินค้ากว่า <strong>${Math.round((1-saleRate)*100)}%</strong> ยังขายไม่ออก`,
+        text:cause,
+        data:[
+          [`${Math.round(unsold)} เครื่อง`,'เหลือขาย'],
+          [locationName,'ตลาด'],
+          [priceOver?`+${Math.round(priceOver)}%`:'ใกล้ราคากลาง','ระดับราคา']
+        ]
+      });
+    }
+
+    if(haloNum(you.transportLoss)>0 || haloNum(you.transportDamagePct)>=10){
+      add(91+haloNum(you.transportDamagePct),{
+        tone:'danger',
+        label:'ความเสียหายขนส่ง',
+        headline:`การขนส่งทำให้เสียหาย <strong>${Math.round(you.transportLoss)} เครื่อง</strong>`,
+        text:`เส้นทางไปยัง ${locationName} ลดจำนวนสินค้าที่พร้อมขายก่อนเข้าสู่ตลาด`,
+        data:[
+          [`${Math.round(you.transportDamagePct)}%`,'ความเสียหาย'],
+          [`${Math.round(you.transportLoss)} เครื่อง`,'สูญเสีย'],
+          [haloFmt(you.transportCost),'ค่าขนส่ง']
+        ]
+      });
+    }
+
+    if(saleRate>=.98 && haloNum(you.availableUnits)>=5){
+      const marketLead=results.filter(r=>haloNum(r.unitsSold)>haloNum(you.unitsSold)).length===0;
+      add(76+Math.min(15,haloNum(you.unitsSold)/2),{
+        tone:'good',
+        label:'โอกาสสำคัญ',
+        headline:`${unitName} <strong>ขายหมดทุกเครื่อง</strong>`,
+        text: marketLead
+          ? `คุณมียอดขายสูงสุดในตลาดรอบนี้ การผลิตเพิ่มอาจเปลี่ยนความต้องการที่พลาดไปเป็นรายได้`
+          : `ตลาดรับสินค้าทั้งหมดที่คุณส่งไป การผลิตครั้งนี้อาจยังต่ำกว่าความต้องการจริง`,
+        data:[
+          [`${Math.round(you.unitsSold)} เครื่อง`,'ขายหมด'],
+          [haloPercent(you.share),'Market Share'],
+          [haloFmt(you.profit),'กำไร']
+        ]
+      });
+    }
+
+    if(haloNum(you.profit)>0 && haloNum(you.profit)>bestPrevious && history.length>1){
+      add(70+Math.min(15,haloNum(you.profit)/10),{
+        tone:'good',
+        label:'สถิติใหม่',
+        headline:`บริษัททำกำไรสูงสุดตั้งแต่เริ่มเกม <strong>${haloFmt(you.profit)}</strong>`,
+        text:`แผนของ ${unitName} ที่ ${locationName} ให้ผลตอบแทนดีที่สุดเมื่อเทียบกับไตรมาสก่อนหน้า`,
+        data:[
+          [haloFmt(you.profit),'กำไรสูงสุด'],
+          [`${Math.round(you.unitsSold)} เครื่อง`,'ยอดขาย'],
+          [haloPercent(you.profitShare),'Revenue Share']
+        ]
+      });
+    }
+
+    if(priceOver>=45 && haloNum(you.unitsSold)>0){
+      add(73+priceOver/5,{
+        tone:'warn',
+        label:'ราคามีความเสี่ยง',
+        headline:`ราคาของ ${unitName} สูงกว่ากลางตลาด <strong>${Math.round(priceOver)}%</strong>`,
+        text: cheaper.length
+          ? `มีคู่แข่งที่ถูกกว่า ${cheaper.length} บริษัทใน ${locationName} ทำให้ยอดขายพึ่งพาคุณภาพและแบรนด์มากผิดปกติ`
+          : `ยอดขายยังเกิดขึ้นได้ แต่ความน่าสนใจด้านราคาถูกลดลงอย่างมาก`,
+        data:[
+          [haloFmt(you.unitPrice),'ราคาขาย'],
+          [haloFmt(you.referencePrice),'ราคากลาง'],
+          [`${Math.round(you.unitsSold)} เครื่อง`,'ขายได้']
+        ]
+      });
+    }
+
+    if(!candidates.length){
+      add(35,{
+        tone:'warn',
+        label:'ประเด็นที่ควรจับตา',
+        headline:`ผลไตรมาสที่ผ่านมา <strong>ยังไม่มีความผิดปกติรุนแรง</strong>`,
+        text:`${unitName} ขายได้ ${Math.round(you.unitsSold)} จาก ${Math.round(you.availableUnits)} เครื่องที่ ${locationName} กลยุทธ์ปัจจุบันยังอยู่ในระดับควบคุมได้`,
+        data:[
+          [`${Math.round(you.unitsSold)}/${Math.round(you.availableUnits)}`,'ยอดขาย'],
+          [haloFmt(you.profit),'กำไร'],
+          [haloPercent(you.share),'Market Share']
+        ]
+      });
+    }
+
+    candidates.sort((a,b)=>b.score-a.score);
+    return candidates[0];
+  }
+
+  function haloEnsureAdvice(){
+    if(!state || state.phase!=='briefing' || haloNum(state.round)<=1) return null;
+    if(state.haloAdvice && haloNum(state.haloAdvice.forRound)===haloNum(state.round)){
+      return state.haloAdvice;
+    }
+    const latest=Array.isArray(state.history) ? state.history[state.history.length-1] : null;
+    if(!latest) return null;
+    const analysis=haloAnalyze(latest);
+    if(!analysis) return null;
+    state.haloAdvice={
+      ...analysis,
+      forRound:haloNum(state.round),
+      sourceRound:haloNum(state.round)-1,
+      dismissed:false
+    };
+    save();
+    return state.haloAdvice;
+  }
+
+  function haloPopupHTML(){
+    const advice=haloEnsureAdvice();
+    if(!advice || advice.dismissed) return '';
+    const toneClass=advice.tone==='good'?'good':advice.tone==='warn'?'warn':'';
+    const metrics=(advice.data||[]).slice(0,3).map(([value,label])=>
+      `<div class="halo-analysis-datum"><b>${esc(String(value))}</b><span>${esc(String(label))}</span></div>`
+    ).join('');
+    return `<div class="halo-analysis-backdrop" role="dialog" aria-modal="true" aria-label="HALO Analysis">
+      <article class="halo-analysis-card">
+        <header class="halo-analysis-head">
+          <div class="halo-pixel" aria-hidden="true">
+            <div class="halo-pixel-body">
+              <i class="halo-eye left"></i>
+              <i class="halo-eye right"></i>
+            </div>
+          </div>
+          <div class="halo-analysis-copy">
+            <div class="halo-analysis-kicker">HALO ANALYSIS</div>
+            <div class="halo-analysis-title">เหตุการณ์สำคัญจากไตรมาส ${String(advice.sourceRound).padStart(2,'0')}</div>
+            <div class="halo-analysis-sub">เลือกแสดงเฉพาะเรื่องที่กระทบบริษัทมากที่สุด</div>
+          </div>
+        </header>
+        <div class="halo-analysis-body">
+          <div class="halo-impact-label ${toneClass}">
+            <span class="halo-impact-icon">${advice.tone==='good'?'↑':advice.tone==='warn'?'!':'!'}</span>
+            ${esc(advice.label)}
+          </div>
+          <h2 class="halo-analysis-headline">${advice.headline}</h2>
+          <p class="halo-analysis-text">${esc(advice.text)}</p>
+          <div class="halo-analysis-data">${metrics}</div>
+        </div>
+        <footer class="halo-analysis-actions">
+          <button class="halo-analysis-close" data-halo-analysis-close>รับทราบ · เริ่มไตรมาสใหม่</button>
+        </footer>
+      </article>
+    </div>`;
+  }
+
+  const originalRenderBriefing=renderBriefing;
+  renderBriefing=function(){
+    return originalRenderBriefing() + haloPopupHTML();
+  };
+
+  const originalNextQuarter=nextQuarter;
+  nextQuarter=function(){
+    if(state?.lastReport){
+      const analysis=haloAnalyze(state.lastReport);
+      if(analysis){
+        state.haloAdvice={
+          ...analysis,
+          forRound:haloNum(state.round)+1,
+          sourceRound:haloNum(state.round),
+          dismissed:false
+        };
+      }
+    }
+    return originalNextQuarter();
+  };
+
+  const originalBindCommon=bindCommon;
+  bindCommon=function(){
+    originalBindCommon();
+    document.querySelectorAll('[data-halo-analysis-close]').forEach(btn=>{
+      btn.onclick=()=>{
+        if(state.haloAdvice){
+          state.haloAdvice.dismissed=true;
+          save();
+        }
+        AudioEngine?.sfx?.('select');
+        document.querySelector('.halo-analysis-backdrop')?.remove();
+      };
+    });
+  };
+
 load(); v2EnsureState(); render();
 })();
 </script>
@@ -11128,5 +11408,238 @@ body::before{
 })();
 </script>
 
+
+
+<!-- PASS 190: HALO POPUP SCOPE FIX
+- ย้ายระบบ HALO เข้า IIFE หลักของเกม ทำให้เข้าถึง state, renderBriefing, nextQuarter และ bindCommon ได้จริง
+- แก้กรณี Popup ไม่แสดงบนหน้า Brief
+-->
+<!-- PASS 189: HALO QUARTER ANALYSIS
+- เพิ่ม HALO Popup บนหน้า Brief ตั้งแต่ Q2
+- เลือกเหตุการณ์ที่กระทบบริษัทหนักที่สุดจากผลไตรมาสก่อน
+- แสดงสาเหตุที่ซ่อนอยู่แบบเจาะจง ไม่ซ้ำกับหน้า Result
+- Popup แสดงครั้งเดียวต่อไตรมาสและไม่ต้อง Scroll
+-->
+<style>
+/* ===== PASS 189 : HALO QUARTER ANALYSIS ===== */
+.halo-analysis-backdrop{
+  position:fixed;
+  inset:0;
+  z-index:520;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:14px;
+  background:rgba(1,6,12,.72);
+  backdrop-filter:blur(3px);
+}
+.halo-analysis-card{
+  position:relative;
+  width:min(374px,calc(100vw - 28px));
+  max-height:calc(100dvh - 28px);
+  overflow:hidden;
+  border:1px solid rgba(95,195,255,.55);
+  border-radius:20px;
+  background:
+    linear-gradient(rgba(95,195,255,.035) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(95,195,255,.035) 1px,transparent 1px),
+    repeating-linear-gradient(135deg,transparent 0 28px,rgba(95,195,255,.025) 29px 30px),
+    linear-gradient(180deg,#10243a 0%,#07131f 100%);
+  background-size:20px 20px,20px 20px,100% 100%,100% 100%;
+  box-shadow:0 28px 70px rgba(0,0,0,.66),inset 0 1px 0 rgba(255,255,255,.06);
+  animation:haloAnalysisEnter .22s ease-out;
+}
+.halo-analysis-card::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:repeating-linear-gradient(180deg,transparent 0 5px,rgba(255,255,255,.018) 6px);
+}
+.halo-analysis-head{
+  position:relative;
+  min-height:94px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:13px 15px;
+  border-bottom:1px solid rgba(95,195,255,.20);
+}
+.halo-analysis-copy{min-width:0;flex:1}
+.halo-analysis-kicker{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  font-size:9px;
+  line-height:1;
+  letter-spacing:1.4px;
+  font-weight:900;
+  color:var(--blue);
+}
+.halo-analysis-kicker::before{
+  content:"";
+  width:6px;height:6px;
+  background:var(--blue);
+  box-shadow:0 0 9px var(--blue);
+}
+.halo-analysis-title{
+  margin-top:7px;
+  font-size:15px;
+  line-height:1.25;
+  font-weight:900;
+}
+.halo-analysis-sub{
+  margin-top:3px;
+  font-size:9.5px;
+  color:var(--muted);
+}
+
+/* Pixel Haro: no arms, no ring */
+.halo-pixel{
+  position:relative;
+  flex:0 0 68px;
+  width:68px;
+  height:68px;
+  image-rendering:pixelated;
+}
+.halo-pixel-body{
+  position:absolute;
+  left:0;top:0;
+  width:68px;height:68px;
+  clip-path:polygon(
+    29% 0,71% 0,85% 7%,93% 18%,100% 34%,100% 66%,
+    93% 82%,85% 93%,71% 100%,29% 100%,15% 93%,7% 82%,
+    0 66%,0 34%,7% 18%,15% 7%
+  );
+  background:
+    linear-gradient(#d8ffc7,#d8ffc7) 20px 7px/12px 6px no-repeat,
+    linear-gradient(#91dc58,#91dc58) 20px 0/28px 6px no-repeat,
+    linear-gradient(#82d14f,#82d14f) 12px 6px/44px 6px no-repeat,
+    linear-gradient(#75c547,#75c547) 6px 12px/56px 12px no-repeat,
+    linear-gradient(#69b940,#69b940) 0 24px/68px 20px no-repeat,
+    linear-gradient(#5da739,#5da739) 6px 44px/56px 12px no-repeat,
+    linear-gradient(#4e8b31,#4e8b31) 12px 56px/44px 6px no-repeat,
+    linear-gradient(#3e7028,#3e7028) 20px 62px/28px 6px no-repeat;
+  box-shadow:4px 4px 0 rgba(0,0,0,.34);
+}
+.halo-pixel-body::before{
+  content:"";
+  position:absolute;
+  left:6px;
+  top:36px;
+  width:56px;
+  height:3px;
+  background:#20341d;
+  box-shadow:0 3px 0 rgba(222,255,213,.10);
+}
+.halo-eye{
+  position:absolute;
+  z-index:2;
+  top:23px;
+  width:6px;
+  height:11px;
+  background:#ff4545;
+  box-shadow:0 0 0 2px #681f1f,0 0 6px rgba(255,69,69,.4);
+}
+.halo-eye.left{left:21px}
+.halo-eye.right{right:21px}
+
+.halo-analysis-body{
+  position:relative;
+  padding:15px 16px 13px;
+}
+.halo-impact-label{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  margin-bottom:8px;
+  font-size:9px;
+  letter-spacing:1px;
+  font-weight:900;
+  color:var(--red);
+}
+.halo-impact-label.good{color:var(--green)}
+.halo-impact-label.warn{color:var(--gold)}
+.halo-impact-icon{
+  width:18px;height:18px;
+  display:grid;place-items:center;
+  border:1px solid currentColor;
+  background:color-mix(in srgb,currentColor 11%,transparent);
+  font-size:10px;
+}
+.halo-analysis-headline{
+  margin:0;
+  font-size:20px;
+  line-height:1.27;
+  letter-spacing:-.2px;
+  font-weight:950;
+}
+.halo-analysis-headline strong{color:var(--blue)}
+.halo-analysis-text{
+  margin:9px 0 0;
+  font-size:12px;
+  line-height:1.52;
+  color:#c7d8e9;
+}
+.halo-analysis-data{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:6px;
+  margin-top:12px;
+}
+.halo-analysis-datum{
+  min-width:0;
+  padding:8px 5px 7px;
+  text-align:center;
+  border:1px solid rgba(95,195,255,.16);
+  background:rgba(1,9,17,.48);
+  border-radius:8px;
+}
+.halo-analysis-datum b{
+  display:block;
+  font-size:12px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.halo-analysis-datum span{
+  display:block;
+  margin-top:2px;
+  font-size:7.5px;
+  color:var(--muted);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.halo-analysis-actions{
+  position:relative;
+  padding:0 16px 14px;
+}
+.halo-analysis-close{
+  width:100%;
+  height:43px;
+  border-radius:11px;
+  background:linear-gradient(180deg,#ffe36b,#dca526);
+  color:#251902;
+  font-size:12px;
+  font-weight:900;
+  box-shadow:0 3px 11px rgba(226,167,42,.35),inset 0 1px rgba(255,255,255,.35);
+}
+.halo-analysis-close:active{transform:scale(.985)}
+@keyframes haloAnalysisEnter{
+  from{opacity:0;transform:translateY(14px) scale(.97)}
+  to{opacity:1;transform:none}
+}
+@media(max-height:610px){
+  .halo-analysis-head{min-height:78px;padding:9px 13px}
+  .halo-pixel{transform:scale(.84);transform-origin:center}
+  .halo-analysis-body{padding:11px 14px 10px}
+  .halo-analysis-headline{font-size:17px}
+  .halo-analysis-text{font-size:10.5px;line-height:1.42}
+  .halo-analysis-data{margin-top:9px}
+  .halo-analysis-actions{padding:0 14px 10px}
+  .halo-analysis-close{height:38px}
+}
+</style>
 
 </body></html>
