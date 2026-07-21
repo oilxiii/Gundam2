@@ -1,533 +1,10 @@
-<!-- PASS 199: EXPERT PROFESSIONAL AI
-- เพิ่มระดับ Expert โดยใช้บอท 7 บริษัท 7 บุคลิก
-- 5 บริษัทใช้สายถาวร: Mass Production, Premium, Marketing, Balanced, Tech Rush
-- Chimera Corp และ Oracle Works ปรับกลยุทธ์ตามข้อมูลสาธารณะและผลรอบก่อน
-- เล่น 8 คนพบบอทครบ 7 ตัว; จำนวนผู้เล่นน้อยกว่านั้นสุ่มจากทั้ง 7 ตัว
-- Expert Bot กด Galactic Gacha ได้ไม่เกิน 1 ครั้งต่อไตรมาสเมื่อเงินสดมากกว่า 500 Cr.
-- เมื่อได้ EYA-01 จะหยุดกาชาตลอดเกม และไม่กู้เงินเพื่อกาชา
-- การตัดสินใจใช้เฉพาะ Event ปัจจุบัน, Tech ที่มี, เงินสด และ Report ที่ผู้เล่นมองเห็น
--->
-<!-- PASS 198: EYA-01 CP REBALANCE
-- ปรับค่าใช้กำลังการผลิตของ EYA-01 จาก 6 CP เป็น 10 CP ต่อเครื่อง
-- คง Tier 3, Quality ขั้นต่ำ 70%, Priority +20 และโบนัสรายได้ +10% ตามเดิม
--->
-<!-- PASS 188: SINGLE PRICE PENALTY
-- ราคาใช้ลดความน่าสนใจผ่าน priceAppeal เพียงครั้งเดียว
-- ตัดการลงโทษราคาซ้ำใน purchaseAcceptance
-- เมื่อข้อเสนอชนะคำสั่งซื้อแล้ว ลูกค้าจะไม่ปฏิเสธซ้ำด้วยราคาเดิม
--->
-<!-- PASS 187: STARTING FUNDS 500
-- ปรับเงินเริ่มต้นของผู้เล่นและ AI จาก 600 Cr. เป็น 500 Cr.
--->
-<!-- PASS 186: FACTORY INVESTMENT EFFECT FIX
-- แก้ให้การลงทุนโรงงาน 100% เพิ่ม Capacity เท่าระบบเดิม 100 Cr.
-- ค่าแถบ 0–100% ใช้เป็นพลังการลงทุน 0–100 หน่วย
-- หักเงินจริงเพียงครึ่งหนึ่ง: 100% = 50 Cr.
-- แก้ทั้งค่าพรีวิว, การหักเงิน และผลเพิ่ม Capacity
--->
-<!-- PASS 185: FACTORY SLIDER FIX
-- แก้บั๊กแถบขยายโรงงานเด้งกลับเป็น 0%
-- แยกค่าเปอร์เซ็นต์บน UI ออกจากค่าเงินจริงที่ใช้คำนวณ
-- ไม่เขียนทับค่า factoryInvest ใน state อีกต่อไป
--->
-<!-- PASS 184: INVESTMENT PERCENT SCALE
-- แถบโฆษณาและขยายโรงงานแสดงเป็น 0% / 25% / 50% / 75% / 100%
-- ขยายโรงงาน 100% ใช้เงินจริง 50 Cr. และเพิ่ม Capacity เท่ากับระบบเดิมที่จ่าย 100 Cr.
-- จำกัดการลงทุนโรงงานของผู้เล่น, AI และค่าเซฟให้อยู่ในช่วง 0–100%
--->
-<!-- PASS 183: ECONOMY REBALANCE
-- โฆษณา 100 แต้ม ใช้เงินจริงสูงสุด 50 Cr. แต่ Appeal x2 และ Brand +4 เท่าเดิม
-- ขยายโรงงานใช้ต้นทุนครึ่งหนึ่ง แต่ได้ Capacity เท่าเดิม
-- Galactic Gacha ลดเหลือ 150 Cr.
-- EYA-01 ลดเหลือ CP 6
--->
-<!-- PASS 182: BASE BUILD AUTO LOAN
-- ถ้าเงินสร้างฐานไม่พอ จะเปิด Popup เงินกู้เดิมทันที
-- เมื่อผู้เล่นกดรับเงินกู้ ระบบรับเงินกู้และสร้างฐานต่อให้อัตโนมัติ
-- แก้ตัวแปรเงินสร้างฐานให้ใช้ funds ซึ่งเป็นเงินสดจริงของเกม
--->
-<!-- PASS 180: THEMED BASE BUILD CONFIRMATION
-- เลือกดาวก่อน แล้วกดยืนยันและจ่าย 100 Cr. ภายใน popup เดิม
-- ปุ่มยังก่อนปิด popup เฉพาะไตรมาสปัจจุบัน และจะกลับมาใหม่ในไตรมาสถัดไป
-- ยกเลิก confirm() ของเบราว์เซอร์
--->
-<!-- PASS 178: EYA-01 PRIORITY WORKING
-- เพิ่ม bestAppeal ให้ระดับ Family และ Variant
-- ใช้ค่า appeal ที่รวม Priority โบนัสของ EYA-01 แล้ว
-- EYA-01 Priority +20 ส่งผลต่อการแย่ง Demand จริง
-- ไม่เปลี่ยนกำลังผลิต ราคา ต้นทุน หรือโบนัสรายได้ +10%
--->
-<!-- PASS175_EYA_PRIORITY_FIX -->
-<!-- PASS 166: GACHA 80% + NO DUPLICATES
-- เอาแท็ก EYA-01 50% ออกจากการ์ด Galactic Gacha
-- เพิ่มโอกาส EYA-01 เป็น 80% ตราบใดที่ยังไม่ได้ปลดล็อก
-- ตัดหุ่นที่ผู้เล่นมีแล้วออกจาก Pool ก่อนสุ่ม
-- เมื่อได้ EYA-01 แล้ว จะสุ่มเฉพาะหุ่นอื่นที่ยังไม่มี
-- เมื่อสะสมครบทุกตัว ปุ่มกาชาจะปิดและไม่หักเงิน
--->
-<!-- PASS 165: Q7 GACHA FEATURE UNLOCK POPUP
-- Galactic Gacha เปิดตัวเป็น Popup กลาง viewport เมื่อเข้า Tech Tree ใน Q7 ครั้งแรก
-- หลัง Animation Popup เคลื่อนลงและเผยการ์ดจริงในตำแหน่งเดิม
-- ไม่เปลี่ยนอัตราสุ่ม ราคา หรือระบบผลกาชา
--->
-<!-- PASS 164: ABSOLUTE SALE PRICE LOCK
-- หลังผู้เล่นปรับราคา ระบบจำราคาขายเป็น Cr. เป็นค่าหลัก
-- เมื่อปรับคุณภาพหรือจำนวนการผลิตจนต้นทุนเปลี่ยน เปอร์เซ็นต์ราคาจะปรับอัตโนมัติ
-- ราคาขายเดิมยังคงอยู่เท่าที่ช่วง 0–300% อนุญาต
-- เปลี่ยนข้อความส่วนลดค่าเหมาชิ้นส่วนจากซัพพลายเออร์
--->
-<!-- PASS 162: GUIDE SECTION 3 FLEX FIX
-- เปลี่ยนการ์ดหัวข้อ 3 จาก Grid เป็น Flex 2 คอลัมน์
-- ตัดการยืดพื้นที่ระหว่างแถวโดยสมบูรณ์
-- คงคู่มือ Popup ปุ่มหนังสือ และเอฟเฟกต์พื้นหลัง
--->
-<!-- PASS 159: GACHA POPUP GRID + RAINBOW SECRET
-- ลดขนาดปุ่มรับทราบและจัดกึ่งกลาง
-- จัดเนื้อหา Popup เป็นกริด ลดข้อความและแท็กเบียดกัน
-- แท็ก EYA-01 จัดเป็น 2 คอลัมน์
-- เปลี่ยนเอฟเฟกต์ SECRET UNIT จากสีทองเป็นสีรุ้ง
--->
-<!-- PASS 158: ลดขนาด Popup กาชาลงประมาณ 20% -->
-<!-- PASS 157: เพิ่ม selector ของ Popup จริงที่พบในไฟล์ -->
-<!-- PASS 156: CENTER ALL POPUPS
-- Popup ทุกระบบยึดกับ viewport ด้วย position:fixed
-- จัดกึ่งกลางแนวตั้งและแนวนอน ไม่ขึ้นกับตำแหน่ง scroll
-- รองรับ 100dvh และ fallback 100vh
-- จำกัดความสูง Popup ให้ไม่ล้นจอ และเลื่อนภายใน Popup แทน
--->
-<!-- PASS 155: ปรับ Typography และช่องไฟของ Popup ให้สบายตาขึ้น -->
-<!-- PASS 154: TRUE 3x2 BASE POPUP
-- แก้กฎหลักโดยตรง ไม่พึ่ง media query 480px
-- สาเหตุเดิม: viewport ที่ใช้งานกว้างกว่า 480px จึงไม่เข้าเงื่อนไข
-- ดาวแสดง 3 คอลัมน์ × 2 แถวทุกหน้าจอ
-- ลดความสูง ข้อความ ช่องไฟ และขนาดส่วนบนจริง
--->
-<!-- PASS 152: MOBILE BASE POPUP 3x2
-- มือถือแสดงดาว 3 คอลัมน์ × 2 แถว เพื่อลดความสูง
-- ไม่เพิ่มความกว้าง Popup
-- ลดตัวอักษรและช่องไฟภายในทั้งหมด
-- คงดาวครบ 6 ดวงและสถานะโรงงานเดิม
--->
-<!-- PASS 150: RESULT INVENTORY ALIGNMENT FIX
-- จัดบล็อกสินค้าคงเหลือเป็นแนวตั้งชิดซ้ายใต้ขายทั้งหมด
-- ป้องกันตัวเลขและสถานะไปติดขอบขวา
--->
-<!-- PASS 149: RESULT INVENTORY GRID
-- ย้ายสินค้าคงเหลือไปอยู่ใต้ยอดขายทั้งหมดฝั่งขวา
-- ปรับหัวสรุป Result เป็นกริด 2 คอลัมน์
-- จัดสถานะขายหมด/มีของค้างให้อยู่ในบล็อกเดียวกัน
--->
-<!-- PASS 148: GACHA RESULT POPUP
-- ผลกาชาแสดงเป็น Popup กลางจอแทนด้านล่าง
-- เพิ่มลำแสงและแฟลชเปิดตัว
-- EYA-01 แสดง SECRET UNIT ก่อน แล้วค่อยเผยตัวหุ่น
-- เพิ่มปุ่มรับทราบเพื่อปิด Popup
--->
-<!-- PASS 147: ลดขนาด Popup ลงอีกประมาณ 10% -->
-<!-- PASS 146: COLONY 7 CENTER FIX
-- ลบกฎ PASS 145 ที่ทำให้โคโลนี่ 7 เบี้ยว
-- จัดกึ่งกลางด้วย flex ที่กรอบรูป
-- ใช้ scale เฉพาะโคโลนี่ 7 โดยไม่ translate
--->
-<!-- PASS 142: balance popup proportions -->
-<!-- ลดขนาดกรอบโดยรวม แต่เพิ่มขนาดดาวเล็กน้อย -->
-<!-- PASS 141: FORCE BASE POPUP 2x3
-- แก้กฎหลัก .base-choice-planets เป็น 2 คอลัมน์
-- แสดง 2×3 ทั้งมือถือและเดสก์ท็อป
-- ลดความกว้าง Popup และความสูงการ์ดเล็กน้อย
--->
-<!-- PASS 139: BASE POPUP EXACT APPROVED DESIGN
-- ใช้โครงสร้างตาม base_unlock_popup_v9_existing_bases
-- มี Hologram, คำอธิบาย, Notice และ Grid 6 ดาวตามต้นแบบ
-- รูปดาวและค่าขนส่งดึงจากข้อมูลจริงของเกม
-- ดาวบ้านเกิด/มีโรงงาน/กำลังก่อสร้างเป็นสีเหลืองและกดไม่ได้
-- ไม่มีปุ่มปิด ต้องเลือกดาวที่ว่าง
--->
-<!-- PASS 134: FIX CONFIRMED BUGS 1-6
-- Demand Priority: <50=0, 50-74=+1, 75-89=+2, 90+=+3
-- Planet Event Priority เพิ่มจากค่าต้นฉบับอีก +1 จริงทุกจุด
-- เงินหน้า Bankruptcy เป็นเงินหลังหักดอกเบี้ย
-- ผู้เล่นล้มละลายถูก mark eliminated และหยุดเข้าตลาด
-- ปุ่มดูผลการแข่งขันต่อจำลอง AI ต่อจนจบ Q12
-- Final Ranking ใช้ frozenScore ณ รอบที่ล้มละลาย
--->
-<!-- PASS 133: BANKRUPTCY BUTTON SCOPE FIX
-- ย้ายฟังก์ชันปุ่มเข้าไปใน IIFE หลักของเกม
-- ดูผลการแข่งขันต่อ: เปลี่ยน state.screen เป็น end แล้วเรียก save/render จริง
-- เริ่มบริษัทใหม่: เรียก v2HardResetGame ของเกมโดยตรง
-- ไม่ใช้ CustomEvent หรือ script ภายนอกที่เข้าถึง state ไม่ได้อีกต่อไป
--->
-<!-- PASS 126: FINANCIAL WARNING MODAL FIX
-- แก้กรณี state.financialWarning ถูกสร้าง แต่ไม่มี UI เรียกแสดง
-- Popup ใช้ระบบ v2ShowModal เดิมของเกม
-- แสดงหลังหน้า Result ถูก render เสร็จ
-- ล้าง financialWarning หลังเรียก Popup เพื่อไม่ให้ขึ้นซ้ำ
--->
-<!-- PASS 125: FIX LOGISTICS SUBMIT
-- แก้ allSubs.map เป็น Object.values(allSubs).map ป้องกัน TypeError ตอนยืนยันส่งขาย
-- หากมีหนี้อยู่แล้ว เงินไม่พอจะไม่บล็อก Logistics
-- หลังรับเงินกู้แล้วอนุญาตให้ส่งขาย แม้วงเงินยังไม่ครอบคลุมค่าใช้จ่าย
-- เพิ่มฟังก์ชันคำนวณคะแนนล้มละลายที่ขาดหายไป
--->
-<!-- PASS 124: ย้าย flow การเตือนล้มละลายไปผูกกับช่วงสรุปผล -->
-<!-- PASS 123: FIX financial popup script error -->
-<!-- PASS 122: เพิ่ม popup เตือนสถานะการเงิน -->
-<!-- PASS 121: BANKRUPTCY TIMING
-- สถานะติดลบจะตรวจ "หลังจบการขายทั้งหมดของไตรมาส"
-- คำนวณหลังรวมกำไร/ขาดทุนจากการขายและหักดอกเบี้ยแล้ว
-- หากเงินคงเหลือกลับมาเป็นมากกว่า 0 จะไม่ถูกนับเป็นสถานะติดลบ
-- bankruptcyStreak จะเพิ่มขึ้นเฉพาะเมื่อปิดงบไตรมาสแล้วยังมีเงินติดลบเท่านั้น
--->
-<!-- PASS 120: BANKRUPTCY SYSTEM
-- หากกู้เงินแล้วเงินติดลบ ยังสามารถส่งหุ่นได้
-- แสดงข้อความเตือน "สถานะการเงินเสี่ยงล้มละลาย"
-- หากเงินติดลบ 2 ไตรมาสติดต่อกัน จะ Game Over
-- คะแนน ณ ขณะนั้นจะถูกเก็บไว้ใน state.bankruptcy.finalScore
--->
-<!-- PASS 119: EYA-01 REBALANCE
-- อัตราออกจาก Galactic Gacha เพิ่มเป็น 50%
-- EYA-01 บังคับ Quality ขั้นต่ำ 70% แต่ผู้เล่นปรับได้ถึง 100%
-- รายได้จากการขาย EYA-01 ได้โบนัสเพิ่ม 10%
-- คง CP 10, Tier 3, สายพิเศษ และ Priority +20
--->
-<!-- PASS 118: Demand Priority Rebalance: <50=0, 50-74=+1, 75-89=+2, 90+=+3 -->
-<!-- PASS 118: Demand priority rebalance pending manual review -->
-<!-- PASS 117: Galactic Pool ใช้ค่าเฉลี่ย Demand ของดาวที่ทุกบริษัทเลือก -->
-<!-- PASS 116: PLANET DEMAND AFFECTS GALACTIC POOL
-- Demand ดาวที่ผู้เล่นเลือกต่ำกว่า 50%: Galactic Pool ×0.90
-- Demand 50–74%: Galactic Pool ×1.25
-- Demand 75% ขึ้นไป: Galactic Pool ×1.50
-- ตัวคูณนี้คูณร่วมกับ poolMult ของ GLOBAL EVENT
-- โบนัส Priority จาก Demand ดาวยังทำงานเหมือนเดิม
--->
-<!-- PASS 114: เพิ่มแท็กสายหุ่นและ Tier บนหน้า Command -->
-<!-- PASS 113: PLANET EVENT PRIORITY BUFF
-- ข่าวประจำดาวทุกประเภทได้รับ Priority เพิ่มจากเดิมอีก +1
-- โบนัสเดิม +1 -> +2
-- โบนัสเดิม +3 -> +4
-- โบนัสเดิม +4 -> +5
-- ไม่กระทบ GLOBAL EVENT หรือ Influencer
--->
-<!-- PASS 112: EYA-01 CLASSIFICATION UPDATE
-- จัด EYA-01 เป็นหุ่นสายพิเศษ
-- กำหนด EYA-01 เป็น Tier 3
-- CP 10, Quality ขั้นต่ำ 70%, Priority +20, ราคาขาย +10% และอัตรากาชา 50%
--->
-<!-- PASS 109: GACHA COST CHECK FIX
-- แก้ handler ที่ยังตรวจเงินขั้นต่ำ 300 Cr หลังลดราคากาชาเป็น 200 Cr
-- UI, การตรวจเงิน และการหักเงินจริงใช้ 200 Cr ตรงกัน
--->
-<!-- PASS 106: GALACTIC GACHA INTEGRATION
-- เพิ่ม Galactic Gacha ใต้ Tech Tree ตั้งแต่ Q7
-- ใช้เอฟเฟกต์ NEW FEATURE UNLOCK เฉพาะการเปิด Gacha ครั้งแรก
-- EYA-01 มีโอกาสคงที่ 50%
-- หุ่นซ้ำสูญเปล่า; EYA-01 CP 10, Quality ขั้นต่ำ 70%, Priority +20, ราคาขาย +10%
--->
-<!-- PASS 105: PLANET EVENT BRAND REPORT FIX
-- โบนัส Brand +2 ของไคจูถูกบันทึกลง r.repDelta ก่อนสร้าง Report
-- กรณีหลายบริษัทขายสูงสุดเท่ากันบนดาวเดียวกัน ได้รางวัลเท่ากัน
-- คงข้อความ Demand โลก 95% ตามเดิม
--->
-<!-- PASS 104: SHOW DESTINATION HINT
-- แก้ CSS เดิมที่ซ่อน .loc-summary small ทั้งหมด
-- แสดงคำใบ้ในช่องปลายทางที่เลือกจริง
-- คงข้อความกำไรต่อเครื่องไว้เหมือนเดิม
--->
-<!-- PASS 103: SELECTED PLANET SALES HINT
-- แสดงคำใบ้ใต้ชื่อดาวที่เลือกใน Logistics
-- อัปเดตทันทีเมื่อเปลี่ยนดาว
-- แบ่งระดับคำใบ้ตาม Priority +1 / +3 / +4
--->
-<!-- PASS 101: PLANET NEWS EVENT REWORK
-- ตั้งแต่ Q2 เป็นต้นไป เกิดข่าวประจำดาว 4 จาก 6 ดาวทุกไตรมาส
-- ข่าวทั้ง 4 รายการในไตรมาสเดียวกันไม่ซ้ำกัน
-- ข่าวปลดล็อกตาม Q2 / Q3 / Q7
-- ไคจูบุกโลกเกิดได้เฉพาะโลก
--->
-<!-- PASS 100: GLOBAL EVENT MECHANIC FIX
-- ล้าง penaltyMostProduced เดิมของประชาชนต่อต้านสงคราม
-- โบนัส/โทษ Top Seller ถูกบันทึกใน Report และ Brand จริงจากค่าเดียวกัน
-- Galaxy Cup ตรวจหุ่นหลังแปลง Quality เพื่อให้เฉพาะ Ball ปกติได้ Priority +5
--->
-<!-- PASS 99: GLOBAL EVENT SCHEDULE FIX
-- แก้ Script error ช่วง Q7–Q8 จาก Event Pool หมด
-- วางตาราง Event ทั้ง 12 ไตรมาสล่วงหน้าด้วย Backtracking
-- Event พิเศษเกิดได้ครั้งเดียว, ตลาดทรงตัวเกิดซ้ำได้ แต่ไม่ติดกัน
--->
-<!-- PASS 98: UNIQUE GLOBAL EVENTS
-- GLOBAL EVENT ทุกชนิดเกิดได้สูงสุด 1 ครั้งต่อเกม
-- ยกเว้น ตลาดทรงตัว เกิดซ้ำได้ไม่จำกัด
-- ตลาดทรงตัวและ Event อื่นยังห้ามออกติดกัน
--->
-<!-- PASS 97: DISPLAY GLOBAL EVENT TITLE
-- แก้ที่ renderBriefing โดยตรง
-- แสดงชื่อ Event ระหว่างหัวข้อ Briefing และคำอธิบาย
-- ไม่แตะระบบสุ่มหรือผลของ Event
--->
-<!-- PASS 95: GLOBAL EVENT SYSTEM REWORK
-- GLOBAL EVENT สุ่มทุกไตรมาส
-- แต่ละอีเวนต์ออกได้สูงสุด 2 ครั้งต่อเกม
-- อีเวนต์เดิมห้ามออกติดกัน
-- Galaxy Cup และ Tech Expo ปลดล็อกตั้งแต่ไตรมาส 8
--->
-<!-- PASS 92: SAFE LUX ADVERTISING COST FIX
-- แก้ Script error จาก Pass 91
-- ใช้ตัวแปร lobbyCost ที่มีอยู่แล้วใน currentCalc()
-- ไม่เพิ่ม helper ใหม่ และไม่แตะ Logistics flow
--->
-<!-- PASS 90: LOGISTICS CONFIRM FIX
-- ย้อนการแก้สูตรโฆษณาที่ทำให้เกิด ReferenceError
-- คืนระบบยืนยันคำสั่งและ Logistics จาก Pass 86
-- คงเฉพาะการแก้ Badge นักบิน
--->
-<!-- PASS 86: PILOT DECISION POPUP
-- เพิ่ม Popup พร้อม Animation ระหว่างนักบินพิจารณาข้อเสนอ
-- แสดงผล ตกลง / ปฏิเสธ ก่อนกลับสู่หน้าเกม
--->
-<!-- PASS 83: Larger pilot typography and clearer action buttons -->
-<!-- PASS 82: PILOT SYSTEM FINALIZED UI
-- คืนอัตราสุ่มจริง 25% / 30% / 40%
-- คงการแก้ stale reference จาก Pass 81
-- เอา Runtime Diagnostic ออก
-- ปรับการ์ดInfluencerและสถานะสัญญาให้เรียบร้อย
--->
-<!-- PASS 81: FIX STALE COMPANY STATE REFERENCE
-- แก้ ensure() ที่เคยสร้าง Object บริษัทใหม่ทุกครั้ง
-- rollUser() จึงไม่เขียน Offer ลง Object เก่าที่หลุดจาก state อีกต่อไป
-- คงโอกาส 100% และ Diagnostic เพื่อยืนยันต้นเหตุ
--->
-<!-- PASS 80: SEPARATE USER AND AI PILOT ROLLS
-- แยกการสุ่มผู้เล่นออกจาก AI โดยสมบูรณ์
-- ไม่มีเงื่อนไข company.id !== 'you' ในเส้นทางของผู้เล่น
-- 100% TEST: ผู้เล่นต้องได้รับ Offer ทุกไตรมาสเมื่อไม่มีสัญญา/ข้อเสนอค้าง
--->
-<!-- PASS 79: FORCE 100% PILOT CONTACT
-- บังคับโอกาสติดต่อเป็น 100% ทุกไตรมาส
-- Math.random() อยู่ในช่วง 0 <= x < 1 จึงต้องเกิด Contact เสมอ
-- เก็บข้อมูล Diagnostic เดิมไว้เพื่อยืนยัน Runtime
--->
-<!-- PASS 78: FORCE 90% PILOT SPAWN FOR DEBUG -->
-<!-- PASS 77: PILOT RUNTIME DIAGNOSTIC
-- ไม่เปลี่ยนโอกาสสุ่มหรือกติกา Pool
-- บันทึกผลสุ่มของผู้เล่นทุกไตรมาส
-- แสดง Roll Count / Random / Chance / Result ในการ์ดInfluencer
--->
-<!-- PASS 76: PER-COMPANY PILOT POOLS
-- Pilot Pool แยกตามบริษัท
-- นักบินคนเดียวกันสามารถติดต่อหลายบริษัทได้
-- ลบออกจาก Pool ของบริษัทนั้นเฉพาะเมื่อเซ็นสัญญาสำเร็จ
-- เจรจาล้มเหลวหรือปฏิเสธแล้วสามารถกลับมาได้
--->
-<!-- PASS 75: PILOT EVENT SYSTEM V2
-- เขียนระบบนักบินใหม่บน No Pilot Build ที่ทดสอบครบ 12 ไตรมาสแล้ว
-- ใช้ state.pilotV2 แยกจากระบบนักบินเก่า
-- ใช้ Portrait 8-bit จากไฟล์ที่ผู้ใช้อัปโหลด
--->
-<!-- PASS 74: BASE SELECTION TYPOGRAPHY FIX
-- จัด Font ในการ์ดสิทธิ์ตั้งฐานใหม่ให้คงที่
-- ป้องกัน Browser ขยายตัวอักษรของปุ่มอัตโนมัติ
-- จัดข้อความชื่อดาวให้ไม่เด้งหรือเบียดกรอบ
--->
-<!-- PASS 73: NO PILOT BUILD
-- ลบระบบนักบินเดิมทั้งหมด
-- ไม่มีการสุ่ม ติดต่อ เจรจา เซ็นสัญญา หรือโบนัสนักบิน
-- คง activeContracts ไว้เฉพาะโบนัสตลาดดาวชั่วคราวของระบบ Logistics
-- ใช้คีย์เซฟใหม่แยกจากทุกเวอร์ชันก่อนหน้า
--->
-<!-- PASS 60: VOLATILE INDEPENDENT PLANET DEMAND
-- Demand ของดาวทั้ง 6 สุ่มแยกกันทุกไตรมาส ตั้งแต่ 40% ถึง 95%
-- ค่า Demand ไม่อิงระดับหรือข่าวประจำดาวโดยค่าเริ่มต้น
-- ข่าวยังให้ Priority เฉพาะหุ่นที่ตรงข่าวตามระบบเดิม
-- Event ที่ระบุ demandOverride หรือ demandDelta สามารถเปลี่ยน Demand ของดาวได้
--->
-<!-- PASS 59: Restore approved Brand loan wording -->
-<!-- PASS 58: Glass panel for portfolio unit cost -->
-<!-- PASS 57: Emphasize portfolio unit cost -->
-<!-- PASS 56: LIVE UNIT COST INCLUDING ADVERTISING
-- เปลี่ยนชื่อเป็น “พอร์ตการผลิต และการลงทุน”
-- เพิ่มต้นทุนหุ่นต่อ 1 ตัวใต้พอร์ตหุ่น
-- ต้นทุนต่อเครื่องรวมส่วนแบ่งค่าโฆษณาแบบเรียลไทม์
-- การ์ดข้อมูลด้านบนใช้ต้นทุนเดียวกัน
--->
-<!-- PASS 54: Update production policy text -->
-<!-- PASS 53: Brand color + Research Point label -->
-<!-- PASS 52: HUD grid alignment -->
-<!-- PASS 51: SPLIT RP / BRAND HUD
-- แบ่งกรอบ RP ด้านบนเป็นสองช่อง
-- เพิ่มการแสดงค่า Brand แบบตัวเลข
--->
-<!-- PASS 50: Adjust base hint style -->
-<!-- PASS 49: Center bulk discount hint -->
-<!-- PASS 48B: MOVE BASE HINT SAFELY
-- แก้จาก Pass 47 ที่ผู้ใช้อัปโหลดโดยตรง
-- ย้ายข้อความปลดล็อก Base ไปใต้คอนโทรลทั้งสองในคอลัมน์ขวา
-- ไม่แก้โครงสร้างหรือกรอบส่วนอื่นของหน้า Command
--->
-<!-- PASS 47: Move base unlock hint -->
-<!-- PASS 44: Rename Brand to Brand -->
-<!-- PASS 43: Larger budget note -->
-<!-- PASS 42: BRAND ACTIVE GLOW
-- หน้าปัด BRAND ส่องแสงเมื่อใช้งบโฆษณามากกว่า 0
-- แสงดับเมื่อปรับงบกลับเป็น 0
--->
-<!-- PASS 41: LIVE BRAND DISPLAY -->
-<!-- PASS 40: LIVE FACTORY LEVEL PREVIEW
-- ขยายชื่อ โฆษณา และ ขยายโรงงาน
-- หน้าปัดโรงงานแสดง Level หลังลงทุนแบบเรียลไทม์
-- เมื่อการลงทุนทำให้ Level เพิ่ม หน้าปัดจะสว่างขึ้น
-- หน้าปัดโฆษณายังคงแสดง Brand ปัจจุบัน
--->
-<!-- PASS 39: FRAMELESS CONTROLS + SCROLL POSITION FIX
-- เอากรอบรอบชุดคอนโทรลโฆษณาและโรงงานออก
-- รักษาตำแหน่ง Scroll เมื่อเลือกหุ่นหรือปรับแผงควบคุม
--->
-<!-- PASS 38: THEMED FADERS + STATUS DISPLAYS
-- แก้ข้อความคอนโทรลไม่ให้หลุดออกจากกรอบ
-- ปรับรางและปุ่ม Fader เป็นโทนเข้มให้เข้ากับธีม
-- หน้าปัดโฆษณาแสดง Brand ปัจจุบัน
-- หน้าปัดโรงงานแสดง Factory LV ปัจจุบัน
--->
-<!-- PASS 37: TRUE VERTICAL ANALOG FADERS
-- เปลี่ยนจาก range ที่หมุนด้วย CSS เป็น vertical range จริง
-- ใช้ writing-mode: vertical-lr และ direction: rtl
-- แสดงสเกล 100 / 75 / 50 / 25 / 0 ด้านข้างชัดเจน
-- ปุ่ม thumb เป็นทรง fader แบบแผงควบคุม
--->
-<!-- PASS 36: ANALOG INVESTMENT SLIDERS
-- ปรับข้อความรวมงบประมาณให้เล็กและจางลง
-- เอาไอคอนโฆษณาและโรงงานออก
-- เปลี่ยนคอนโทรลเป็นแถบเลื่อนอนาล็อกแนวตั้ง
-- แสดงตัวเลข 0 / 25 / 50 / 75 / 100 ด้านข้างแถบ
--->
-<!-- PASS 35: PORTFOLIO + VERTICAL INVESTMENT CONTROLS
-- ตัดช่องกรอก R&D ออกจากหน้า Command
-- รวมพอร์ตหุ่นและการลงทุนไว้ในแผงเดียว
-- พอร์ตหุ่นฝั่งซ้ายเป็นตาราง 3×3 รวม 9 ช่อง
-- ฝั่งขวาเป็นตัวเลื่อนแนวตั้งสำหรับโฆษณาและขยายโรงงาน
-- ระดับการลงทุน 0 / 25 / 50 / 75 / 100 และรีเซ็ตเป็น 0 ทุกไตรมาส
--->
-<!-- PASS 34: GALACTIC CENTRAL POOL
-- ดาวเพิ่ม Priority จาก Market Demand และข่าวประจำดาว
-- บริษัททั้งหมดแข่งขันใน Galactic Pool เดียว
-- ยกเลิก LOCAL COMPANIES
-- จำนวนบริษัทที่เลือกดาวเดียวกันไม่มีผลต่อการแบ่งตลาด
--->
-<!-- PASS 33: FIX LOGISTICS COUNT + REMOVE NEGATIVE RANKING REP
-- แก้ NaN ในข้อความ Logistics โดยนับบริษัทจาก location จริง
-- ยกเลิก Brand ติดลบจาก Revenue Share / อันดับท้ายตาราง
--->
-<!-- PASS 30: SINGLE REUSABLE LOAN
-- มีเงินกู้เพียงก้อนเดียว ดอกเบี้ย 8% ต่อไตรมาส
-- วงเงินกู้คำนวณจาก Brand ตามสูตรเดิม
-- เมื่อชำระหนี้เต็มจำนวนแล้ว สามารถกู้ใหม่ได้อีก
-- ตัดเงินกู้และการกู้ครั้งที่ 2 ออก
-- ตัดการชำระบางส่วน เหลือเฉพาะชำระหนี้ทั้งหมด
--->
-<!-- PASS 28: TWO-STAGE LOAN + REPAYMENT
-- เงินกู้ปกติใช้ได้ 1 ครั้ง และเงินกู้ใช้ได้อีก 1 ครั้ง
-- ถ้าเงินกู้ก้อนแรกยังไม่พอ ระบบสามารถเสนอเงินกู้ครั้งที่ 2 ต่อได้ทันที
-- เพิ่ม Loan Management ในหน้า Command
-- เพิ่มปุ่มชำระหนี้ทั้งหมดแบบกำหนดจำนวนหรือคืนทั้งหมด
-- คืนหนี้ 20% ก่อนหนี้ปกติ 8%
--->
-<!-- PASS 27: LOCAL COMPANIES EMBLEM
-- แก้ตำแหน่งไอคอนใน Result ให้ตรงจุดจริง
-- LOCAL COMPANIES ใช้ตราดาวเคราะห์สีน้ำเงินพร้อมวงโคจร แทนรูปหุ่น
--->
-<!-- PASS 25: 12 QUARTERS + HOLOGRAM SHARE DISPLAY
-- แก้ระยะเกมและตัวเลข HUD ให้เป็น 12 ไตรมาสจริง
-- ปรับสี Market Share / Revenue Share ให้สุขุมลง
-- เปลี่ยนกรอบกราฟเป็นจอโฮโลแกรม มี scanline และเส้น HUD
--->
-<!-- PASS 24: GALACTIC SHARE + OPEN HOME MARKET
-- ดาวบ้านเกิดขายหุ่นได้ทุก Tier
-- Market Share และ Revenue Share คำนวณจากยอดรวมทั้งอวกาศ
-- บริษัทท้องถิ่นทั้ง 6 ดาวรวมเป็น LOCAL COMPANIES หนึ่งกลุ่ม
-- Brand ด้านการแข่งขันอิง Galactic Revenue Share ของบริษัทหลัก 8 แห่ง
-- ลดระยะเกมกลับเป็น 12 ไตรมาส
--->
-<!-- PASS 117
-หน้า Command ของไตรมาสที่สรุปแล้วเป็น read-only สีเทาจาง
-ปุ่มยืนยันคำสั่งถูกแทนด้วยปุ่มกลับ Report เพื่อไม่ให้ผู้เล่นติดอยู่ในหน้า Command
--->
-<!-- PASS 115
-แก้ selector จริงจาก .page.command เป็น .page.cmd
-ล็อกทุก action หลังสรุปผล รวมถึงขายซากและขายเท่าทุน
--->
-<!-- PASS 114
-หน้า Command หลังสรุปผลจะถูกครอบด้วยโอเวอร์เลย์สีเทา
-ทุก action ภายในหน้า Command ถูกบล็อก แต่แท็บนำทางด้านล่างยังใช้งานได้
--->
-<!-- PASS 112
-Command controls lock whenever state.lastReport exists.
-They unlock only after nextQuarter clears state.lastReport.
--->
-<!-- PATCH 109: DEMAND ACCEPTANCE + SINGLE PRICE SOURCE
-- UI และ Engine ใช้ marketReferencePrice ตัวเดียวกัน
-- Price Appeal ใช้แข่งขัน; Purchase Acceptance กรอง allocatedOrders
-- Demand ที่ถูกปฏิเสธไหลไปข้อเสนอที่ถูกกว่าใน Family เพียงครั้งเดียว แล้วหาย
-- Revenue Share ใช้รายได้รวมจริง ไม่มี baseline
-- Brand จาก Revenue Share ยังคง cap -2 ถึง +4
-- AI ตั้งราคาอิงราคากลางและต้นทุน
--->
-<!-- PATCH 108: REFERENCE PRICE + STABLE PROFIT SHARE
-- ราคากลางคงที่: Ball 5 / Mass 10 / RX 20 / Gouf 35 / New RX 50 Cr.
-- ราคาถูกเพิ่มแรงซื้อแบบไม่มีเพดาน
-- ราคาแพงกว่าตลาดลด Appeal ด้วย inverse-square
-- ระบบเดิมเคยมี baseline 10 ต่อบริษัท
-- Brand จาก Revenue Share จำกัด -2 ถึง +4 ต่อรอบ
--->
-<!-- PATCH 107: REPUTATION ENGINE REWORK
-- Brand ด้านการแข่งขันใช้ Revenue Share แทน Market Share
-- ถ้ากำไรขั้นต้นบวกทั้งตลาดเป็น 0 จะไม่มีโบนัส/โทษฐานส่วนแบ่งรายได้
-- Event boostTop ใช้ผู้นำ Revenue Share
-- โฆษณา, Event Rep, Performance Bonus และขายเท่าทุน -4 ยังทำงานเหมือนเดิม
--->
-<!-- PATCH 105: REPORT INVENTORY SUMMARY
-เพิ่มสินค้าคงเหลือในแถวสรุปด้านบน พร้อมสถานะขายหมด/มีของค้าง
--->
-<!-- PATCH 104: PROFIT SHARE REPORT
-กราฟและอันดับหน้า Report ใช้ส่วนแบ่งรายได้ขั้นต้นจากสินค้าที่ขาย
-Revenue Share = Revenue / รายได้รวมทั้งอวกาศ
-Market Share ตามจำนวนขายยังคงใช้ภายในกลไกBrandและเหตุการณ์
--->
-<!-- PATCH 103: TRUE HIERARCHICAL MARKET
-ตลาดใหญ่ -> Family -> Variant -> บริษัท
-จำนวนบริษัทใน Variant เดียวกันไม่เพิ่ม Demand ของ Variant
-ราคา/คุณภาพ/Brand/โฆษณาสามารถดึง Demand ข้าม Variant ใน Family เดียวกัน
--->
-<!-- PATCH 102: REMOVE PRICE SALES CAP
-ราคาใช้ปรับ Market Appeal เท่านั้น
-ไม่จำกัดจำนวนขายด้วย availableUnits × priceAcceptance อีกต่อไป
-ยอดขายสูงสุดถูกจำกัดด้วยสินค้าที่มีจริงและคำสั่งซื้อที่ได้รับ
--->
-<!-- PASS 168: FIX GLOBAL EVENT REPORT SCOPE + FULL ROW COLOR -->
-<!-- PASS 193: ADVISOR NO-REPEAT + SALES-DROP DETECTION
-- ไม่รายงานหัวข้อเดิมซ้ำในช่วง 3 ข่าวล่าสุด
-- ตรวจจับกรณีขายหมดต่อเนื่องอย่างน้อย 2 ไตรมาส แล้วมีสินค้าคงเหลือ
-- เพิ่มความไวของเงื่อนไขโฆษณาหนัก/ราคาต่ำแต่ขายไม่หมด
--->
-<!-- PASS 194: ADVISOR NO CONSECUTIVE REPEAT
-- อนุญาตให้หัวข้อเดิมกลับมาในภายหลัง แต่ห้ามซ้ำติดกับไตรมาสก่อน
-- เปรียบเทียบทั้งรหัสหัวข้อและข้อความพาดหัว
-- เพิ่มข่าวรองจากข้อมูลจริงเพื่อใช้แทนเมื่อประเด็นหลักซ้ำ
--->
-<!-- PASS 195: ADVISOR CONSECUTIVE REPEAT FIX
-- แก้จุดสร้างคำแนะนำล่วงหน้าใน nextQuarter ให้บันทึกหัวข้อที่เลือกทันที
-- ระบบจึงสามารถตรวจหัวข้อของไตรมาสก่อนหน้าได้จริง
-- ป้องกันข้อความ “ขายหมดแม้ใช้งบโฆษณาน้อย” ขึ้นติดกัน
--->
-<!-- PASS 196: ADVISOR CATEGORY ROTATION
-- แบ่งข่าวเป็นหมวด วิกฤต / คู่แข่ง / ผลประกอบการ / การผลิต
-- หากไม่มีเรื่องผิดปกติ ระบบจะพยายามสลับหมวดที่รายงาน
-- ข่าวด้านผลประกอบการจะไม่วนซ้ำตลอดเวลา
-- เมื่อขายดีต่อเนื่อง ผู้ช่วยจะหันไปรายงานเรื่องคู่แข่งและตลาดแทน
--->
-<!-- PASS 197: COMPETITOR INTELLIGENCE
-- เพิ่มข่าวคู่แข่งด้าน Tier ราคา โฆษณา และระดับเทคโนโลยี
-- วิเคราะห์บริษัทที่มี Market Share หรือ Revenue Share สูงกว่า พร้อมสาเหตุจากข้อมูลจริง
-- เมื่อตัวผู้เล่นยังขายหมดและไม่ขาดทุน จะเน้นข่าวคู่แข่งแทนการชมผลประกอบการ
-- ข่าววิกฤตยังมีสิทธิ์แทรกทุกหมวด
+<!-- PASS 216: CORE FIXES
+- ข่าวประจำดาวทุกประเภทได้รับ Priority เพิ่มอีก +1 จาก PASS 215 จริงที่จุดสร้างข่าวกลาง
+- Expert AI เลือกดาวจาก Demand, ข่าวที่ตรงกับหุ่น และค่าขนส่งจริง แทนการสุ่มล้วน
+- แก้คำอธิบายฐาน Logistics ให้ชัดว่าใช้ลดค่าขนส่งและไม่เพิ่ม Capacity/CP
+- รวม v2FreePilotBaseUses ให้เหลือ helper กลางเพียงชุดเดียว
+- คง Galactic Pool: Demand <50% ×0.90, 50–74% ×1.50, 75%+ ×1.75
+- ไม่แก้โครงสร้างหรือหัวข้ออื่นของคู่มือ
 -->
 <!doctype html>
 <html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="format-detection" content="telephone=no"><title>Mobile Suit Production Command</title><style>
@@ -1957,15 +1434,57 @@ section.page.cmd.command-locked .actions{
 .v2-debt-item small{display:block;margin-top:3px;font-size:7.5px;line-height:1.3;color:var(--faint)}
 .v2-debt-actions{
   display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:8px;
-  padding:8px var(--sp-3) 0;
+  flex-direction:column;
+  align-items:stretch;
+  gap:7px;
+  padding:9px var(--sp-3) 0;
   font-size:9px;
   color:var(--muted);
 }
-.v2-debt-actions .mini-btn{min-width:92px}
-.v2-debt-actions .mini-btn:disabled{opacity:.35;pointer-events:none}
+.v2-debt-cash{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  padding:0 2px;
+}
+.v2-debt-cash b{
+  color:var(--green);
+  font-size:11px;
+}
+.v2-repay-all-btn{
+  width:100%;
+  min-height:44px;
+  border-radius:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  padding:9px 12px;
+  color:#241a02;
+  background:linear-gradient(180deg,#ffe36b,#e2a72a);
+  border:1px solid #ffe36b;
+  box-shadow:0 3px 12px rgba(226,167,42,.32),0 1px 0 rgba(255,255,255,.32) inset;
+  font-size:12px;
+  font-weight:900;
+}
+.v2-repay-all-btn:active:not(:disabled){
+  transform:scale(.98);
+  filter:brightness(.96);
+}
+.v2-repay-all-btn:disabled{
+  opacity:.48;
+  cursor:not-allowed;
+  color:#d4c9a1;
+  background:rgba(255,216,79,.10);
+  border-color:rgba(255,216,79,.30);
+  box-shadow:none;
+}
+.v2-repay-all-btn small{
+  font-size:9px;
+  font-weight:800;
+  opacity:.78;
+}
 .v2-repay-box{
   margin:10px 0;
   padding:10px;
@@ -4611,7 +4130,13 @@ section.page.cmd.command-locked .actions{
   <rect x="17" y="26" width="4" height="4" fill="#5c3027"/>
 </symbol>
 <symbol id="zaku-red-symbol" viewBox="0 0 32 32"><rect x="11" y="4" width="10" height="3" fill="#2d1414"/><rect x="8" y="7" width="16" height="3" fill="#1a0808"/><rect x="6" y="10" width="20" height="12" fill="#1a0808"/><rect x="8" y="23" width="16" height="4" fill="#1a0808"/><rect x="9" y="8" width="14" height="3" fill="#8a3030"/><rect x="7" y="11" width="18" height="10" fill="#c0392b"/><rect x="9" y="22" width="14" height="4" fill="#7a2a2a"/><rect x="11" y="14" width="10" height="4" fill="#2a1414"/><rect x="15" y="14" width="2" height="4" fill="#ffd54f"/><rect x="3" y="13" width="4" height="8" fill="#6b2a2a"/><rect x="25" y="13" width="4" height="8" fill="#6b2a2a"/><rect x="11" y="27" width="4" height="3" fill="#562222"/><rect x="17" y="27" width="4" height="3" fill="#562222"/></symbol><symbol id="zaku-purple-symbol" viewBox="0 0 32 32"><rect x="11" y="4" width="10" height="3" fill="#2a1440"/><rect x="8" y="7" width="16" height="3" fill="#0d0616"/><rect x="6" y="10" width="20" height="12" fill="#0d0616"/><rect x="8" y="23" width="16" height="4" fill="#0d0616"/><rect x="9" y="8" width="14" height="3" fill="#7c4aa0"/><rect x="7" y="11" width="18" height="10" fill="#a64fe0"/><rect x="9" y="22" width="14" height="4" fill="#6b3a8a"/><rect x="11" y="14" width="10" height="4" fill="#2a1440"/><rect x="15" y="14" width="2" height="4" fill="#ffd54f"/><rect x="3" y="13" width="4" height="8" fill="#5a3570"/><rect x="25" y="13" width="4" height="8" fill="#5a3570"/><rect x="11" y="27" width="4" height="3" fill="#4e2761"/><rect x="17" y="27" width="4" height="3" fill="#4e2761"/></symbol><symbol id="gm-gold-symbol" viewBox="0 0 32 32"><rect x="10" y="5" width="12" height="3" fill="#111822"/><rect x="7" y="8" width="18" height="4" fill="#111822"/><rect x="6" y="12" width="20" height="13" fill="#111822"/><rect x="9" y="8" width="14" height="4" fill="#f2d878"/><rect x="8" y="12" width="16" height="12" fill="#d4af37"/><rect x="11" y="14" width="10" height="4" fill="#111822"/><rect x="12" y="15" width="8" height="2" fill="#c0392b"/><rect x="7" y="19" width="18" height="2" fill="#ef4b4b"/><rect x="3" y="14" width="4" height="8" fill="#8a6d1f"/><rect x="25" y="14" width="4" height="8" fill="#8a6d1f"/><rect x="12" y="25" width="3" height="5" fill="#2b6de0"/><rect x="17" y="25" width="3" height="5" fill="#2b6de0"/></symbol>
-</svg><script>const GameData = (() => {
+</svg><script>
+function v2FreePilotBaseUses(player,currentRound){
+  if(Number(player?.pilotFreeBaseRound||0)!==Number(currentRound||0)) return 0;
+  return Math.max(0,Number(player?.pilotFreeBaseUses||0));
+}
+</script>
+<script>const GameData = (() => {
   const MAX_ROUNDS = 12;
   const START_FUNDS = 500;
   const BASE_POOL = 100;
@@ -4686,7 +4211,7 @@ section.page.cmd.command-locked .actions{
     { id:'zagu-red', tier:1, branch:'special', special:true, cpCost:2, baseCost:8.0, basePrice:12.5, rnd:'mid', price:'mid', name:'Zagu Red', tag:'ว่ากันว่าเร็วกว่ารุ่นปกติสามเท่า แม้ไม่มีใครพิสูจน์ได้', sprite:'zaguRed' },
     { id:'gold-rx', tier:2, branch:'special', special:true, cpCost:3, baseCost:14.0, basePrice:21.0, rnd:'high', price:'high', name:'Gold RX', tag:'หุ่นสีทอง เป้ายิงที่โดดเด่นกลางสนามรบ', sprite:'goldRx' },
     { id:'magz', tier:3, branch:'special', special:true, cpCost:4, baseCost:25.0, basePrice:39.0, rnd:'high', price:'high', name:'MagZ', tag:'ซูเปอร์โรบอตปริศนาที่หลายคนตั้งคำถามว่า “มาได้ไงวะ?”', sprite:'magz' },
-    { id:'eya-01', tier:3, branch:'special', special:true, secret:true, cpCost:10, baseCost:25.0, basePrice:39.0, rnd:'high', price:'high', name:'EYA-01', tag:'หุ่นยนต์คุณภาพที่พร้อมเปลี่ยนคนขับให้เป็นน้ำส้ม', sprite:'eya01' },
+    { id:'eya-01', tier:3, branch:'special', branches:['rx','zagu','goz','special'], special:true, secret:true, cpCost:6, baseCost:25.0, basePrice:39.0, rnd:'high', price:'high', name:'EYA-01', tag:'หุ่นยนต์คุณภาพที่พร้อมเปลี่ยนคนขับให้เป็นน้ำส้ม', sprite:'eya01' },
   ];
 
   const TECH_TIERS = [
@@ -4805,9 +4330,7 @@ section.page.cmd.command-locked .actions{
   function hasFreeFactoryContract(player) {
     return activePilotContracts(player).some(c=>c.effectType==='factoryFree');
   }
-
-
-  const BOT_NAMES = ['Anaheim', 'Zeonic', 'MIP Works', 'Luna Steel', 'Axis Dynamics', 'Jupiter Arsenal', 'Side Seven Works'];
+const BOT_NAMES = ['Anaheim', 'Zeonic', 'MIP Works', 'Luna Steel', 'Axis Dynamics', 'Jupiter Arsenal', 'Side Seven Works'];
 
   function band(v) { return v < 34 ? 'low' : v < 67 ? 'mid' : 'high'; }
   function clamp(n, min, max) { return Math.max(min, Math.min(max, n)); }
@@ -4874,9 +4397,17 @@ section.page.cmd.command-locked .actions{
   }
 
   function purchaseAcceptanceFromMarket(unitPrice, referencePrice) {
-    // PASS 188: ราคาได้ส่งผลต่อการแข่งขันผ่าน priceAppeal แล้ว
-    // จึงไม่กรองหรือปฏิเสธคำสั่งซื้อซ้ำเป็นรอบที่สอง
-    return 1;
+    const actual = Math.max(0.01, Number(unitPrice || 0.01));
+    const reference = Math.max(0.01, Number(referencePrice || 1));
+    const ratio = actual / reference;
+
+    // ราคาที่ไม่เกินราคากลาง: ลูกค้ายอมรับคำสั่งซื้อทั้งหมด
+    if (ratio <= 1) return 1;
+
+    // ราคาที่สูงกว่าตลาด: หลังชนะการจัดสรร Demand แล้ว
+    // ลูกค้าบางส่วนยังปฏิเสธตามส่วนต่างราคา
+    // Demand ที่ถูกปฏิเสธจะไหลไปหาข้อเสนอที่ถูกกว่าเพียงครั้งเดียว
+    return clamp(1 / Math.pow(ratio, 2), 0.05, 1);
   }
   function qualityAppealFactor(quality = 50) {
     // Quality 50 is the baseline. Range: x0.60 at 0 to x1.40 at 100.
@@ -5297,7 +4828,7 @@ section.page.cmd.command-locked .actions{
         // ใช้ข้อเสนอที่ดีที่สุดเป็นหน้าตาของ Variant
         // จึงไม่เกิดปัญหา 7 บริษัท Ball รวมคะแนนทับ Ball Kai บริษัทเดียว
         bestOfferAppeal: Math.max(...sellers.map(r => Number(r.offerAppeal || 0.0001))),
-        // คะแนนเต็มรวม Priority ของหุ่น, ข่าวดาว, Event และ EYA-01 +20
+        // คะแนนเต็มรวม Priority พื้นฐานของหุ่น ข่าวดาว และ Event; EYA-01 ไม่มีโบนัส Priority เฉพาะตัว
         bestAppeal: Math.max(...sellers.map(r => Number(r.appeal || 0.0001)))
       }));
 
@@ -5333,7 +4864,7 @@ section.page.cmd.command-locked .actions{
         familyPriority: Math.max(...sellers.map(r => Number(r.familyPriority || 1))),
         // Family ใช้ข้อเสนอที่ดีที่สุด ไม่ใช้ผลรวมจำนวนบริษัท
         bestOfferAppeal: Math.max(...sellers.map(r => Number(r.offerAppeal || 0.0001))),
-        // คะแนนเต็มรวม Priority ของหุ่น, ข่าวดาว, Event และ EYA-01 +20
+        // คะแนนเต็มรวม Priority พื้นฐานของหุ่น ข่าวดาว และ Event; EYA-01 ไม่มีโบนัส Priority เฉพาะตัว
         bestAppeal: Math.max(...sellers.map(r => Number(r.appeal || 0.0001)))
       }));
 
@@ -5448,8 +4979,7 @@ section.page.cmd.command-locked .actions{
       const matchedPreferred = !!(event.preferredUnitId && (event.preferredUnitId === r.unit.id || event.preferredUnitId === r.unit.baseId));
       const marketBonus = matchedPreferred ? 0.10 : 0;
       const contractBonus = activeUnitContractBonus(r.player, r.unit.id, r.unit.baseId, r.sub.quality ?? r.sub.rndFocus ?? 50);
-      const eyaSaleBonus = r.unit.id==='eya-01' ? 0 : 0;
-      const revenue = unitsSold * r.econ.unitPrice * (1 + marketBonus + contractBonus + eyaSaleBonus);
+      const revenue = unitsSold * r.econ.unitPrice * (1 + marketBonus + contractBonus);
 
       // ต้นทุนสินค้าที่ขายจริง:
       // ของเก่าใช้ต้นทุนที่ติดมากับแต่ละล็อต ส่วนของใหม่ใช้ต้นทุนต่อเครื่องของรอบนี้
@@ -5481,40 +5011,40 @@ section.page.cmd.command-locked .actions{
         inventoryQty:holding.qty, inventoryValue:holding.value,
         inventoryRate:holding.rate, inventoryCost:holding.cost,
         revenue, cogs, grossProductProfit, productionCost, cost, profit,
-        matchedPreferred, marketBonus, contractBonus, eyaSaleBonus,
+        matchedPreferred, marketBonus, contractBonus,
         performanceBonus, perfTriggered
       };
     });
 
-    const totalSold = provisional.reduce((s,r)=>s+r.unitsSold,0) || 1;
+    const totalSold = provisional.reduce((s,r)=>s+Math.max(0,Number(r.unitsSold||0)),0);
     const totalRevenue = provisional.reduce(
       (sum, r) => sum + Math.max(0, Number(r.revenue || 0)),
       0
     );
+    const topUnitsSold = totalSold > 0
+      ? Math.max(...provisional.map(r=>Math.max(0,Number(r.unitsSold||0))))
+      : 0;
+    const topRevenue = totalRevenue > 0
+      ? Math.max(...provisional.map(r=>Math.max(0,Number(r.revenue||0))))
+      : 0;
 
     const results = provisional.map(r => {
-      const share = r.unitsSold / totalSold;
+      const unitsSoldScore = Math.max(0,Number(r.unitsSold||0));
+      const share = totalSold > 0 ? unitsSoldScore / totalSold : 0;
       const profitShareScore = Math.max(0, Number(r.revenue || 0));
-      const profitShare = totalRevenue > 0
-        ? profitShareScore / totalRevenue
-        : 1 / Math.max(1, rows.length);
+      const profitShare = totalRevenue > 0 ? profitShareScore / totalRevenue : 0;
       const adRepBonus = Math.min(4, clamp(Number(r.sub.lobby || 0), 0, 100) / 25);
 
-      // คะแนนBrandด้านการแข่งขันเปลี่ยนมาใช้ Revenue Share
-      // ถ้าทั้งตลาดไม่มีกำไรขั้นต้นบวก จะไม่มีโบนัส/โทษจากส่วนแบ่งรายได้
-      const averageProfitShare = 1 / Math.max(1, rows.length);
-      const profitPerformanceRep = clamp(
-        (profitShare - averageProfitShare) * 8,
-        -2,
-        4
-      );
+      const marketLeaderRep = totalSold > 0 && unitsSoldScore === topUnitsSold ? 1 : 0;
+      const revenueLeaderRep = totalRevenue > 0 && Math.abs(profitShareScore-topRevenue)<1e-9 ? 1 : 0;
+      const profitPerformanceRep = marketLeaderRep + revenueLeaderRep;
 
       const repDelta = profitPerformanceRep
         + (event.repAll || 0)
         + (r.perfTriggered ? 1.5 : 0)
         + adRepBonus;
 
-      return {...r, share, profitShare, profitShareScore, profitPerformanceRep, repDelta};
+      return {...r, share, profitShare, profitShareScore, marketLeaderRep, revenueLeaderRep, profitPerformanceRep, repDelta};
     });
 
     if (event.boostTop && results.length) {
@@ -5537,7 +5067,7 @@ section.page.cmd.command-locked .actions{
 
 (function(){
 'use strict';
-const KEY = 'mspc-v2-pass105-planet-event-brand-report-fix-save';
+const KEY = 'mspc-v2-pass216-core-fixes-save';
 const $ = (sel, root=document) => root.querySelector(sel);
 const app = $('#app');
 const safeStorage = (() => {
@@ -6489,7 +6019,7 @@ function submitRound(){
     updated=applyResearch(updated,r.sub.rndInvest||0); notices.push(...(updated.techNotices||[])); delete updated.techNotices; return updated;
   });
   state.notices=notices;
-  state.lastReport={event,results:results.map(r=>({playerId:r.player.id,name:r.player.name,unit:r.unit,quality:Number(r.sub.quality||0),unitPrice:r.econ.unitPrice,advertising:Number(r.sub.lobby||0),priceStrategy:Number(r.sub.priceStrategy||0),share:r.share,profitShare:r.profitShare,profitShareScore:r.profitShareScore,grossProductProfit:r.grossProductProfit,cogs:r.cogs,referencePrice:r.referencePrice,priceRatio:r.priceRatio,priceAppeal:r.priceAppeal,purchaseAcceptance:r.purchaseAcceptance,ordersBeforePriceFilter:r.ordersBeforePriceFilter,ordersRejectedByPrice:r.ordersRejectedByPrice,ordersReceivedFromPriceFlow:r.ordersReceivedFromPriceFlow||0,production:r.sub.production,unitsSold:r.unitsSold,fromStock:r.fromStock,availableUnits:r.availableUnits,transportDamagePct:r.transportDamagePct||0,transportLoss:r.transportLoss,freshDeliverable:r.freshDeliverable,leftoverFresh:r.leftoverFresh,inventoryQty:r.inventoryQty,inventoryCost:r.inventoryCost,inventoryRate:r.inventoryRate,revenue:r.revenue,cost:r.cost,profit:r.profit,profitPerformanceRep:r.profitPerformanceRep,repDelta:r.repDelta,marketBonus:r.marketBonus||0,performanceBonus:r.performanceBonus||0,perfTriggered:!!r.perfTriggered,crowdCount:r.crowdCount||1,crowdMult:r.crowdMult||1,matchedPreferred:!!r.matchedPreferred}))};
+  state.lastReport={event,results:results.map(r=>({playerId:r.player.id,name:r.player.name,unit:r.unit,quality:Number(r.sub.quality||0),unitPrice:r.econ.unitPrice,advertising:Number(r.sub.lobby||0),priceStrategy:Number(r.sub.priceStrategy||0),share:r.share,profitShare:r.profitShare,profitShareScore:r.profitShareScore,grossProductProfit:r.grossProductProfit,cogs:r.cogs,referencePrice:r.referencePrice,priceRatio:r.priceRatio,priceAppeal:r.priceAppeal,purchaseAcceptance:r.purchaseAcceptance,ordersBeforePriceFilter:r.ordersBeforePriceFilter,ordersRejectedByPrice:r.ordersRejectedByPrice,ordersReceivedFromPriceFlow:r.ordersReceivedFromPriceFlow||0,production:r.sub.production,unitsSold:r.unitsSold,fromStock:r.fromStock,availableUnits:r.availableUnits,transportDamagePct:r.transportDamagePct||0,transportLoss:r.transportLoss,freshDeliverable:r.freshDeliverable,leftoverFresh:r.leftoverFresh,inventoryQty:r.inventoryQty,inventoryCost:r.inventoryCost,inventoryRate:r.inventoryRate,revenue:r.revenue,cost:r.cost,profit:r.profit,marketLeaderRep:r.marketLeaderRep||0,revenueLeaderRep:r.revenueLeaderRep||0,profitPerformanceRep:r.profitPerformanceRep,repDelta:r.repDelta,marketBonus:r.marketBonus||0,performanceBonus:r.performanceBonus||0,perfTriggered:!!r.perfTriggered,crowdCount:r.crowdCount||1,crowdMult:r.crowdMult||1,matchedPreferred:!!r.matchedPreferred}))};
   state.history.push(state.lastReport); state.phase='report'; AudioEngine.sfx('report'); save(); render();
 }
 function nextQuarter(){
@@ -6670,7 +6200,7 @@ function renderCommand(){
   <div class="card unit-card-main">
     <div class="unit-preview">
       <div class="unit-header-tags">
-        <span class="unit-header-badge">${c.unit.branch==='special'?'Special':c.unit.branch}</span>
+        <span class="unit-header-badge">${v2UnitBranchLabel(c.unit)}</span>
         <span class="unit-header-badge">Tier ${c.unit.tier}</span>
       </div>
       <div class="sprite-box" data-live="unitIcon">${unitIcon(c.unit)}</div>
@@ -6872,7 +6402,12 @@ function renderReport(){
   const rep=state.lastReport;
   if(!rep) return renderBriefing();
 
-  const sorted=[...rep.results].sort((a,b)=>(b.profitShare||0)-(a.profitShare||0));
+  const brandScore=(r)=>{
+    const player=state.players.find(p=>p.id===r.playerId);
+    return Number(player?.reputation||0);
+  };
+
+  const sorted=[...rep.results].sort((a,b)=>brandScore(b)-brandScore(a));
   const you=sorted.find(r=>r.playerId==='you')||sorted[0];
   const profitClass=you.profit>=0?'green':'red';
 
@@ -6923,10 +6458,12 @@ function renderReport(){
               : `${esc(r.unit?.name||'ไม่ทราบรุ่น')} · <span class="price">ตั้งราคา ${price} Cr.</span> · <span class="ad">${adText}</span>${rep.event.id==='space-pirates'?` · โจรสลัด ${r.transportDamagePct||0}%`:''}`}
           </div>
         </div>
-        <div class="rank-share">${Math.round((r.profitShare||0)*1000)/10}%</div>
+        <div class="rank-share"><small>Brand</small><br>${Math.round(brandScore(r)*10)/10}</div>
       </div>
     </div>`;
   }).join('');
+
+  const rankLabel='<div class="muted" style="margin:10px 0 14px;text-align:center;font-size:12px">อันดับด้านล่างจัดเรียงตามค่า Brand ปัจจุบันของแต่ละบริษัท</div>';
 
   return `<section class="page report">
     <div class="page-body">
@@ -6964,7 +6501,7 @@ function renderReport(){
             <div class="news-line"><b>${esc(me().name)}:</b> ผลิตใหม่ ${you.production} · ขายจากสต็อก ${you.fromStock||0} · ขายทั้งหมด ${you.unitsSold} เครื่อง</div>
             ${rep.event.id==='space-pirates'?`<div class="news-line"><b>การขนส่ง:</b> ถูกโจรสลัดโจมตี ${you.transportDamagePct||0}% · เสียหาย ${you.transportLoss||0} · ส่งถึงตลาด ${you.freshDeliverable} เครื่อง</div>`:''}
             
-            <div class="news-line"><b>มูลค่า Brand จาก Revenue Share:</b> ${Number(you.profitPerformanceRep||0)>=0?'+':''}${fmt(you.profitPerformanceRep||0)}</div>
+            <div class="news-line"><b>โบนัส Brand จากผู้นำตลาด:</b> Market Share +${fmt(you.marketLeaderRep||0)} · Revenue Share +${fmt(you.revenueLeaderRep||0)}</div>
             <div class="news-line"><b>Logistics:</b> ${
               (() => {
                 const planetName=(V2_PLANETS.find(p=>p.id===you.location)?.name)||you.location;
@@ -6990,7 +6527,7 @@ function renderReport(){
         </div>
       </div>
 
-      <div class="rank-all">${rows}</div>
+      <div class="rank-all">$${rankLabel}${rows}</div>
     </div>
 
     <div class="actions">
@@ -7111,15 +6648,15 @@ const PilotEventSystemV2 = (()=>{
     {id:'rookie-pilot',rarity:'common',name:'นักบินดาวรุ่ง',role:'นักบินดาวรุ่ง',effectType:'allPrice',effectValue:.10,effectText:'ราคาขายหุ่นทุกตัว +10% คำนวณหลังการขาย',duration:3,startRound:1},
     {id:'military-reviewer',rarity:'common',name:'นักรีวิวสายทหาร',role:'ผู้เชี่ยวชาญภาคสนาม',effectType:'priorityFlat',effectValue:1,effectText:'Priority ของหุ่นทุกตัวที่ขาย +1',duration:3,startRound:1},
     {id:'recycler',rarity:'common',name:'นักรีไซเคิล',role:'ผู้เชี่ยวชาญการกู้ซาก',effectType:'scrapRate',effectValue:.50,effectText:'ราคาขายซากเพิ่มจาก 25% เป็น 50%',duration:2,startRound:1},
-    {id:'amuro-bay',rarity:'rare',name:'อามุโล่ เบย์',role:'นักบินเอซ',effectType:'qualityFree',effectValue:1,effectText:'Quality 70% ขึ้นไปไม่เสียต้นทุน Quality เพิ่ม',duration:3,startRound:5},
-    {id:'zaza-impossible',rarity:'rare',name:'ซาซ่า อิมพอสสิเบิล',role:'นักบินเอซ',effectType:'tierPrice',effectValue:.20,tiers:[2,3],effectText:'ราคาขายหุ่น Tier 2 และ Tier 3 +20% คำนวณหลังการขาย',duration:3,startRound:5},
-    {id:'kira-yamato',rarity:'rare',name:'คิละ ยามาโต้',role:'นักบินเอซ',effectType:'qualityFree',effectValue:1,effectText:'Quality 70% ขึ้นไปไม่เสียต้นทุน Quality เพิ่ม',duration:3,startRound:5},
-    {id:'mu-la-flaga-cappuccino',rarity:'rare',name:'มูราฟาก้า คาปูชิโน่',role:'นักบินเอซ',effectType:'tierPrice',effectValue:.20,tiers:[2,3],effectText:'ราคาขายหุ่น Tier 2 และ Tier 3 +20% คำนวณหลังการขาย',duration:3,startRound:5},
-    {id:'setsu-fzk',rarity:'rare',name:'เซ็ทซึโนะ FZK',role:'นักบินเอซ',effectType:'qualityFree',effectValue:1,effectText:'Quality 70% ขึ้นไปไม่เสียต้นทุน Quality เพิ่ม',duration:3,startRound:5},
-    {id:'catone-daimun',rarity:'rare',name:'แคทวัน ไดแมว',role:'นักบินเอซ',effectType:'specialPrice',effectValue:.20,effectText:'ราคาขายหุ่นรุ่นพิเศษ +20% คำนวณหลังการขาย',duration:3,startRound:5},
-    {id:'orphan-force',rarity:'legendary',name:'กลุ่มกองกำลังเด็กกำพร้า',role:'ทีมปฏิบัติการพิเศษ',effectType:'factoryFree',effectValue:1,effectText:'ไม่เสียค่าขยายโรงงาน',duration:1,startRound:8},
-    {id:'lux-who',rarity:'legendary',name:'รักซ์ ใคร ไอดอลแห่งจักรวาล',role:'ไอดอลแห่งจักรวาล',effectType:'advertisingFree',effectValue:1,effectText:'ไม่เสียค่าโฆษณา',duration:1,startRound:8},
-    {id:'legendary-pilot',rarity:'legendary',name:'นักบินระดับตำนาน',role:'ตำนานแห่งสมรภูมิ',effectType:'tierPrice',effectValue:.50,tiers:[3],effectText:'ราคาขายหุ่น Tier 3 +50% คำนวณหลังการขาย',duration:1,startRound:8}
+    {id:'amuro-bay',rarity:'rare',name:'อามุโล่ เบย์',role:'นักบินเอซ',effectType:'qualityFree',effectValue:1,effectText:'Quality 70% ขึ้นไปไม่เสียต้นทุน Quality เพิ่ม',duration:3,startRound:6},
+    {id:'zaza-impossible',rarity:'rare',name:'ซาซ่า อิมพอสสิเบิล',role:'นักบินเอซ',effectType:'tierPrice',effectValue:.20,tiers:[2,3],effectText:'ราคาขายหุ่น Tier 2 และ Tier 3 +20% คำนวณหลังการขาย',duration:3,startRound:6},
+    {id:'kira-yamato',rarity:'rare',name:'คิละ ยามาโต้',role:'นักบินเอซ',effectType:'qualityFree',effectValue:1,effectText:'Quality 70% ขึ้นไปไม่เสียต้นทุน Quality เพิ่ม',duration:3,startRound:6},
+    {id:'mu-la-flaga-cappuccino',rarity:'rare',name:'มูราฟาก้า คาปูชิโน่',role:'นักบินเอซ',effectType:'tierPrice',effectValue:.20,tiers:[2,3],effectText:'ราคาขายหุ่น Tier 2 และ Tier 3 +20% คำนวณหลังการขาย',duration:3,startRound:6},
+    {id:'setsu-fzk',rarity:'rare',name:'เซ็ทซึโนะ FZK',role:'นักบินเอซ',effectType:'qualityFree',effectValue:1,effectText:'Quality 70% ขึ้นไปไม่เสียต้นทุน Quality เพิ่ม',duration:3,startRound:6},
+    {id:'catone-daimun',rarity:'rare',name:'แคทวัน ไดแมว',role:'นักบินเอซ',effectType:'specialPrice',effectValue:.20,effectText:'ราคาขายหุ่นรุ่นพิเศษ +20% คำนวณหลังการขาย',duration:3,startRound:6},
+    {id:'orphan-force',rarity:'legendary',name:'กลุ่มกองกำลังเด็กกำพร้า',role:'ทีมปฏิบัติการพิเศษ',effectType:'freeLogisticsBase',effectValue:1,effectText:'สร้างฐาน Logistics ใหม่ฟรี 1 ฐาน',duration:1,startRound:6},
+    {id:'lux-who',rarity:'legendary',name:'รักซ์ ใคร ไอดอลแห่งจักรวาล',role:'ไอดอลแห่งจักรวาล',effectType:'advertisingFree',effectValue:1,effectText:'ไม่เสียค่าโฆษณา',duration:1,startRound:6},
+    {id:'legendary-pilot',rarity:'legendary',name:'นักบินระดับตำนาน',role:'ตำนานแห่งสมรภูมิ',effectType:'tierPrice',effectValue:.50,tiers:[3],effectText:'ราคาขายหุ่น Tier 3 +50% คำนวณหลังการขาย',duration:1,startRound:6}
   ];
 
   function blankCompanyState(){
@@ -7198,6 +6735,7 @@ const PilotEventSystemV2 = (()=>{
     const signed=new Set(cs.signedPilotIds);
     return PILOTS.filter(p=>
       p.startRound<=round &&
+      !(p.rarity==='common' && round>6) &&
       !signed.has(p.id)
     );
   }
@@ -7224,6 +6762,11 @@ const PilotEventSystemV2 = (()=>{
 
     company.activeContracts=company.activeContracts||[];
     company.activeContracts.push(makeContract(pilot));
+    if(pilot.effectType==='freeLogisticsBase'){
+      company.pilotFreeBaseRound=Number(state.round||1);
+      company.pilotFreeBaseUses=1;
+      company.baseChoiceDeferredRound=0;
+    }
 
     const cs=companyState(company.id);
     cs.signedPilotIds=[...new Set([...cs.signedPilotIds,pilot.id])];
@@ -7761,6 +7304,7 @@ const V2_TECH_COST = {
   zagu:20,doz:40,salami:80,gm:20,rx:40,'new-rx':80,
   goz:20,gkoog:40,gbaley:80,'zagu-red':25,'gold-rx':50,magz:100
 };
+const V2_GACHA_COST = 200;
 const V2_PREV = {
   doz:'zagu',salami:'doz',rx:'gm','new-rx':'rx',gkoog:'goz',gbaley:'gkoog',
   'gold-rx':'zagu-red',magz:'gold-rx'
@@ -7858,7 +7402,7 @@ const V2_HINT_TEMPLATES = [
     startRound:2,
     kind:'unit',
     unitId:'ball-kai',
-    level:1,
+    level:2,
     text:'อยากได้บอลที่ไม่เหมือนใคร ต้องการหุ่น Ball Kai',
     hint:'หุ่น Ball Kai จะขายดีเป็นพิเศษ'
   },
@@ -7867,7 +7411,7 @@ const V2_HINT_TEMPLATES = [
     startRound:2,
     kind:'branch',
     branch:'zagu',
-    level:1,
+    level:2,
     text:'ว่างๆ อยากเปิดสงคราม ขอหุ่นรุ่นผลิตจำนวนมาก',
     hint:'หุ่นสาย Zagu จะขายดีเป็นพิเศษ'
   },
@@ -7876,7 +7420,7 @@ const V2_HINT_TEMPLATES = [
     startRound:2,
     kind:'branch',
     branch:'goz',
-    level:1,
+    level:2,
     text:'อยากได้หุ่นรบคุณภาพ ราคาไม่ประหยัด',
     hint:'หุ่นสาย Goz จะขายดีเป็นพิเศษ'
   },
@@ -7885,7 +7429,7 @@ const V2_HINT_TEMPLATES = [
     startRound:2,
     kind:'branch',
     branch:'rx',
-    level:1,
+    level:2,
     text:'คนบนดาวดูการ์ตูนจนเริ่มสนใจหุ่นพระเอก',
     hint:'หุ่นสาย RX จะขายดีเป็นพิเศษ'
   },
@@ -7894,7 +7438,7 @@ const V2_HINT_TEMPLATES = [
     startRound:3,
     kind:'branch',
     branch:'special',
-    level:1,
+    level:2,
     text:'นักสะสมกำลังตามหาหุ่นพิเศษจำนวนมาก',
     hint:'หุ่นสายพิเศษจะขายดีเป็นพิเศษ'
   },
@@ -7903,7 +7447,7 @@ const V2_HINT_TEMPLATES = [
     startRound:3,
     kind:'tier',
     tier:2,
-    level:1,
+    level:2,
     text:'หุ่นธรรมดา เริ่มธรรมดาไป กำลังมองหาหุ่น Tier 2',
     hint:'หุ่น Tier 2 จะขายดีเป็นพิเศษ'
   },
@@ -7912,7 +7456,7 @@ const V2_HINT_TEMPLATES = [
     startRound:3,
     kind:'tier',
     tier:3,
-    level:3,
+    level:4,
     text:'ผมมีเงินเหลือต้องการหุ่น Tier 3 อย่างเร่งด่วน',
     hint:'หุ่น Tier 3 จะขายดีอย่างมาก'
   },
@@ -7921,7 +7465,7 @@ const V2_HINT_TEMPLATES = [
     startRound:7,
     kind:'unit',
     unitId:'salami',
-    level:3,
+    level:4,
     text:'จะทำพิซซ่าใครมี Salami ที่นี่รับหมด',
     hint:'Salami จะขายดีสุด ๆ'
   },
@@ -7930,7 +7474,7 @@ const V2_HINT_TEMPLATES = [
     startRound:7,
     kind:'unit',
     unitId:'new-rx',
-    level:3,
+    level:4,
     text:'คนที่นี่กำลังเบียว ต้องการหุ่น New RX ด่วน!',
     hint:'New RX จะขายดีสุด ๆ'
   },
@@ -7939,7 +7483,7 @@ const V2_HINT_TEMPLATES = [
     startRound:7,
     kind:'unit',
     unitId:'gbaley',
-    level:3,
+    level:4,
     text:'สายแฟชั่นกำลังแย่งซื้อ Gbaley มาประดับบ้าน',
     hint:'Gbaley จะขายดีสุด ๆ'
   },
@@ -7948,7 +7492,7 @@ const V2_HINT_TEMPLATES = [
     startRound:7,
     kind:'unit',
     unitId:'magz',
-    level:3,
+    level:4,
     text:'กระแสหุ่นเหล็กกำลังมา ต้องการ MagZ จำนวนมาก',
     hint:'MagZ จะขายดีสุด ๆ'
   },
@@ -7958,7 +7502,7 @@ const V2_HINT_TEMPLATES = [
     earthOnly:true,
     kind:'tier',
     tier:3,
-    level:4,
+    level:5,
     text:'ไคจูบุกโลก! ต้องการหุ่น Tier 3 มาช่วยด่วน!',
     hint:'หุ่น Tier 3 จะขายดีสุด ๆ',
     demandOverride:95,
@@ -7979,6 +7523,20 @@ function v2CanUnlock(id,player=me()){
   const prev=V2_PREV[id];
   return !prev || unlocked.has(prev);
 }
+
+function v2UnitBranches(unit){
+  if(!unit) return [];
+  if(Array.isArray(unit.branches) && unit.branches.length) return unit.branches;
+  return unit.branch ? [unit.branch] : [];
+}
+function v2UnitHasBranch(unit, branch){
+  return v2UnitBranches(unit).includes(branch);
+}
+function v2UnitBranchLabel(unit){
+  const labels={rx:'RX',zagu:'Zagu',goz:'Goz',special:'Special',basic:'Basic'};
+  return v2UnitBranches(unit).map(id=>labels[id]||String(id).toUpperCase()).join(' / ');
+}
+
 function v2Unit(id){ return GameData.UNIT_TYPES.find(u=>u.id===id) || GameData.UNIT_TYPES[0]; }
 function v2TechSpend(id,player=me()){
   const total=V2_TECH_COST[id]||0, prev=V2_PREV[id], prevTotal=prev?(V2_TECH_COST[prev]||0):0;
@@ -8041,7 +7599,7 @@ function v2PrepareHints(){
 
     const event=candidates[Math.floor(Math.random()*candidates.length)];
     usedEventIds.add(event.id);
-    hints.push({...event,level:Number(event.level||0)+1,planetId:planet.id});
+    hints.push({...event,level:Number(event.level||0)+2,planetId:planet.id});
   });
 
   state.v2PlanetHints=hints;
@@ -8110,7 +7668,7 @@ function v2HintMatches(h,u){
   if(!h||!u) return false;
   if(h.kind==='unit') return u.id===h.unitId;
   if(h.kind==='tier') return Number(u.tier)===Number(h.tier);
-  if(h.kind==='branch') return u.branch===h.branch;
+  if(h.kind==='branch') return v2UnitHasBranch(u,h.branch);
   return false;
 }
 function v2AllowedAtHome(player,unit,planetId){
@@ -8138,6 +7696,7 @@ function v2EnsureState(){
     if(typeof p.v2SpecialTreeAnimated!=='boolean') p.v2SpecialTreeAnimated=false;
     if(!Array.isArray(p.bases)) p.bases=[];
     if(!Array.isArray(p.baseBuilds)) p.baseBuilds=[];
+    if(!Array.isArray(p.freeLogisticsBases)) p.freeLogisticsBases=[];
     if(!Number.isFinite(p.regularDebt)) p.regularDebt=Number(p.debt||0);
     if(!Number.isFinite(p.emergencyDebt)) p.emergencyDebt=0;
     if(typeof p.regularLoanUsed!=='boolean') p.regularLoanUsed=Number(p.regularDebt||0)>0;
@@ -8157,11 +7716,24 @@ function v2EnsureState(){
 function v2ProcessBaseBuilds(player){
   const complete=(player.baseBuilds||[]).filter(b=>b.completeRound<=state.round);
   const pending=(player.baseBuilds||[]).filter(b=>b.completeRound>state.round);
-  complete.forEach(b=>{ if(!(player.bases||[]).includes(b.planetId)) player.bases.push(b.planetId); });
+  complete.forEach(b=>{
+    if(!(player.bases||[]).includes(b.planetId)) player.bases.push(b.planetId);
+    if(b.source==='orphan-force' && !(player.freeLogisticsBases||[]).includes(b.planetId)){
+      player.freeLogisticsBases.push(b.planetId);
+    }
+  });
   player.baseBuilds=pending;
 }
 function v2AvailableBaseSlot(player){
-  return v2BaseSlots(player.capacity)-(player.bases||[]).length-(player.baseBuilds||[]).length;
+  const freeBases=new Set(player.freeLogisticsBases||[]);
+  const normalCompleted=(player.bases||[]).filter(pid=>!freeBases.has(pid)).length;
+  const normalBuilding=(player.baseBuilds||[]).filter(b=>b.source!=='orphan-force').length;
+  return v2BaseSlots(player.capacity)-normalCompleted-normalBuilding;
+}
+function v2TotalAvailableBaseBuilds(player){
+  const normalReady=Number(player?.baseSlotReadyRound||0)<=Number(state.round||0)
+    ? Math.max(0,v2AvailableBaseSlot(player)) : 0;
+  return normalReady+v2FreePilotBaseUses(player,state.round);
 }
 function v2SparkleHTML(){
   return '<i class="v2-spark s1">✦</i><i class="v2-spark s2">✧</i><i class="v2-spark s3">✦</i>';
@@ -8282,7 +7854,7 @@ startGame = function(){
   const count = clamp($('#botCount')?.value || 2,1,7);
   const selectedDifficulty = $('#aiDifficulty')?.value || 'medium';
   const shuffled=[...V2_PLANETS].sort(()=>Math.random()-.5);
-  const mk=(id,n,isBot,i,style='balanced',difficulty=selectedDifficulty)=>({id,name:n,funds:GameData.START_FUNDS,reputation:0,debt:0,regularDebt:0,emergencyDebt:0,capacity:GameData.START_CAPACITY,isBot,inventory:{},activeContracts:[],techLevel:0,rp:12,v2Unlocked:[],v2BallUnlocked:false,v2SpecialRevealed:false,v2RevealSpecialNextRound:false,v2SpecialRevealNotice:false,v2SpecialNoticeShown:false,v2SpecialTreeAnimated:false,bases:[],baseBuilds:[],homePlanet:shuffled[i%6].id,aiStyle:style,aiDifficulty:isBot?difficulty:'player',v2GachaLastRound:0});
+  const mk=(id,n,isBot,i,style='balanced',difficulty=selectedDifficulty)=>({id,name:n,funds:GameData.START_FUNDS,reputation:0,debt:0,regularDebt:0,emergencyDebt:0,capacity:GameData.START_CAPACITY,isBot,inventory:{},activeContracts:[],techLevel:0,rp:12,v2Unlocked:[],v2BallUnlocked:false,v2SpecialRevealed:false,v2RevealSpecialNextRound:false,v2SpecialRevealNotice:false,v2SpecialNoticeShown:false,v2SpecialTreeAnimated:false,bases:[],baseBuilds:[],freeLogisticsBases:[],homePlanet:shuffled[i%6].id,aiStyle:style,aiDifficulty:isBot?difficulty:'player',v2GachaLastRound:0});
   let bots;
   if(selectedDifficulty==='expert'){
     const roster=count===7 ? [...V2_EXPERT_ROSTER] : [...V2_EXPERT_ROSTER].sort(()=>Math.random()-.5).slice(0,count);
@@ -8338,7 +7910,7 @@ renderBriefing = function(){
   }
   return `<section class="page brief"><div class="page-body">
     <div class="card hero"><div class="hero-icon tone-${esc(ev.tone||'info')}">${eventIcon(ev)}</div><div class="hero-text"><span class="eyebrow">Briefing · QTR ${String(state.round).padStart(2,'0')}</span><div class="hero-event-title">${esc(ev.title||ev.name||'GLOBAL EVENT')}</div><p class="hero-summary">${esc(ev.summary)}</p></div></div>
-    ${secretNotice}<div class="card intel"><div class="section-title"><span class="text">ข่าวตลาดตามดาว</span><span class="badge">สุ่ม 2–3 แห่ง</span></div><div class="intel-list">${hints||'<div class="intel-item">ยังไม่มีข่าวเฉพาะดาว</div>'}</div></div>
+    ${secretNotice}<div class="card intel"><div class="section-title"><span class="text">ข่าวตลาดตามดาว</span><span class="badge">สุ่ม 4 แห่ง</span></div><div class="intel-list">${hints||'<div class="intel-item">ยังไม่มีข่าวเฉพาะดาว</div>'}</div></div>
     <div class="stat-grid brief-summary"><div class="card"><div class="label">Cash</div><div class="value cash">${fmt(p.funds)}</div></div><div class="card"><div class="label">Stock</div><div class="value">${inv.qty}</div></div><div class="card"><div class="label">RP</div><div class="value cp">${Math.round(p.rp||0)}</div></div><div class="card"><div class="label">Debt</div><div class="value red">${fmt((p.regularDebt||0)+(p.emergencyDebt||0))}</div></div></div>
   </div><div class="actions single"><button class="btn btn-primary" data-phase="tech">ไป Tech Tree <span class="arrow">→</span></button></div></section>`;
 };
@@ -8365,7 +7937,7 @@ function v2GachaResultCard(result){
           ${duplicate?'หุ่นซ้ำ — การสุ่มครั้งนี้สูญเปล่า':secret?'หุ่นยนต์คุณภาพที่พร้อมเปลี่ยนคนขับให้เป็นน้ำส้ม':'ปลดล็อกเข้าสู่สายการผลิตแล้ว'}
         </div>
         <div class="v2-gacha-popup-tags">
-          ${secret?'<i>Quality 70%+</i><i>ราคาขาย +10%</i>':duplicate?'<i>ไม่ได้รับอะไร</i>':'<i>ปลดล็อกทันที</i><i>ไม่ใช้ RP</i>'}
+          ${secret?'<i>Quality 70%+</i><i>RX / Zagu / Goz / Special</i>':duplicate?'<i>ไม่ได้รับอะไร</i>':'<i>ปลดล็อกทันที</i><i>ไม่ใช้ RP</i>'}
         </div>
         <button class="v2-gacha-popup-close" data-gacha-popup-close>รับทราบ</button>
       </div>
@@ -8379,13 +7951,13 @@ function v2RenderGacha(player){
   const unlockedNow=v2Unlocked(player);
   const availableGachaUnits=GameData.UNIT_TYPES.filter(u=>u.id!=='ball-kai' && !unlockedNow.has(u.id));
   const hasAvailable=availableGachaUnits.length>0;
-  const canPay=Number(player.funds||0)>=150 && hasAvailable;
+  const canPay=Number(player.funds||0)>=V2_GACHA_COST && hasAvailable;
   const gachaCard=`<section class="card v2-gacha-card">
       <div class="v2-gacha-copy">
         <div class="v2-gacha-title">GALACTIC GACHA</div>
         <p>ลุ้นกาชาปลดล็อกหุ่นโดยไม่ใช้ค่า RP<br>การสุ่มจะไม่ออกหุ่นที่คุณมีอยู่แล้ว</p>
-        <div class="v2-gacha-rules"><span>150 Cr / ครั้ง</span></div>
-        <button class="v2-gacha-btn" data-gacha-pull ${canPay?'':'disabled'}>${hasAvailable?(canPay?'สุ่ม 1 ครั้ง · 150 Cr':'เงินไม่พอ'):'สะสมครบทุกตัวแล้ว'}</button>
+        <div class="v2-gacha-rules"><span>${V2_GACHA_COST} Cr / ครั้ง</span></div>
+        <button class="v2-gacha-btn" data-gacha-pull ${canPay?'':'disabled'}>${hasAvailable?(canPay?`สุ่ม 1 ครั้ง · ${V2_GACHA_COST} Cr`:'เงินไม่พอ'):'สะสมครบทุกตัวแล้ว'}</button>
       </div>
       <div class="v2-gacha-machine" aria-hidden="true">
         <div class="v2-gacha-machine-sign">GACHA</div>
@@ -8517,7 +8089,9 @@ function renderLocation(){
   }).join('');
 
   const baseChoiceDeferredThisRound=Number(p.baseChoiceDeferredRound||0)===Number(state.round||0);
-  const buildOptions=!resolved&&slots>0&&!baseChoiceDeferredThisRound
+  const freePilotBaseUses=v2FreePilotBaseUses(p,state.round);
+  const totalBaseBuilds=v2TotalAvailableBaseBuilds(p);
+  const buildOptions=!resolved&&totalBaseBuilds>0&&!baseChoiceDeferredThisRound
     ? V2_PLANETS.map(pl=>{
         const home=pl.id===p.homePlanet;
         const owned=home||(p.bases||[]).includes(pl.id);
@@ -8581,8 +8155,8 @@ function renderLocation(){
             <div class="base-choice-desc">
               <h3>ปลดล็อกการขยายโรงงาน</h3>
               <p>
-                บริษัทของคุณมีขนาดใหญ่พอที่จะขยายสายการผลิตได้แล้ว
-                การขยายฐานการผลิตใหม่จะทำให้ฐานนั้นไม่เสียค่าขนส่ง
+                ${freePilotBaseUses>0?'กองกำลังเด็กกำพร้ามอบสิทธิ์ตั้งฐาน Logistics เพิ่ม':'บริษัทของคุณมีขนาดใหญ่พอที่จะขยายเครือข่าย Logistics แล้ว'}
+                ฐานใหม่มีผลเฉพาะค่าขนส่ง และไม่เพิ่มกำลังการผลิต
               </p>
 
               <div class="base-choice-notice">
@@ -8592,8 +8166,8 @@ function renderLocation(){
           </div>
 
           <div class="base-choice-required">
-            กรุณาเลือกดาว 1 ดวงเพื่อขยายสายการผลิต<br>
-            <span style="color:var(--gold)">ค่าก่อสร้างฐาน 100 Cr.</span>
+            กรุณาเลือกดาว 1 ดวงเพื่อตั้งฐาน Logistics<br>
+            <span style="color:var(--gold)">${freePilotBaseUses>0?'สิทธิ์จากกองกำลังเด็กกำพร้า · ฟรี':'ค่าก่อสร้างฐาน 100 Cr.'}</span>
           </div>
 
           <div class="base-choice-planets">${buildOptions}</div>
@@ -8605,7 +8179,7 @@ function renderLocation(){
           <div class="base-choice-actions">
             <button class="btn btn-secondary" id="deferBaseBuild">ยังก่อน</button>
             <button class="btn btn-primary" id="confirmBaseBuild" disabled>
-              ยืนยันและจ่าย 100 Cr.
+              ${freePilotBaseUses>0?'ยืนยันสร้างฐานฟรี':'ยืนยันและจ่าย 100 Cr.'}
             </button>
           </div>
         </div>
@@ -8634,15 +8208,29 @@ function renderLocation(){
 };
 
 function v2ExpertGacha(bot){
-  if(bot.aiDifficulty!=='expert' || Number(state.round||1)<4) return;
-  if(Number(bot.funds||0)<=300) return;
+  if(bot.aiDifficulty!=='expert' || Number(state.round||1)<7) return;
+
+  const reserveByStyle={
+    mass:500,
+    premium:300,
+    marketing:450,
+    balanced:400,
+    research:300,
+    adaptive:375,
+    opportunist:350
+  };
+  const style=bot.aiStyle||'balanced';
+  const requiredFunds=Math.max(V2_GACHA_COST,Number(reserveByStyle[style]??400));
+  if(Number(bot.funds||0)<requiredFunds) return;
   if(Number(bot.v2GachaLastRound||0)===Number(state.round||0)) return;
+
   const unlocked=v2Unlocked(bot);
   if(unlocked.has('eya-01')) return;
   const normalPool=GameData.UNIT_TYPES.filter(u=>u.id!=='eya-01' && u.id!=='ball-kai' && !unlocked.has(u.id));
   if(!normalPool.length && unlocked.has('eya-01')) return;
+
   bot.v2GachaLastRound=Number(state.round||0);
-  bot.funds=Math.round((Number(bot.funds||0)-150)*10)/10;
+  bot.funds=Math.round((Number(bot.funds||0)-V2_GACHA_COST)*10)/10;
   let unit=null;
   if(!unlocked.has('eya-01') && (Math.random()<0.80 || normalPool.length===0)) unit=v2Unit('eya-01');
   else if(normalPool.length) unit=normalPool[Math.floor(Math.random()*normalPool.length)];
@@ -8659,41 +8247,58 @@ function v2ExpertUnlock(bot,style){
     'zagu-red':['zagu-red','gold-rx','magz']
   };
   const unitOf=id=>v2Unit(id)||GameData.UNIT_TYPES.find(u=>u.id===id)||{tier:0,cpCost:99,basePrice:0};
+  const scoreRoot=rootId=>{
+    const finalUnit=unitOf(V2_TECH_CHAINS[rootId][V2_TECH_CHAINS[rootId].length-1]);
+    let score=Math.random()*3;
+    if(style==='research') score+=Number(finalUnit.tier||0)*20+Number(finalUnit.basePrice||0);
+    else if(style==='mass') score+=-Number(finalUnit.cpCost||1)*8;
+    else if(style==='premium') score+=Number(finalUnit.tier||0)*18+Number(finalUnit.basePrice||0)*1.5;
+    else score+=Number(finalUnit.tier||0)*8+Number(finalUnit.basePrice||0)*0.4;
+    return score;
+  };
+  const chooseRemainingChain=()=>{
+    const roots=Object.keys(V2_TECH_CHAINS)
+      .filter(root=>V2_TECH_CHAINS[root].some(id=>v2CanUnlock(id,bot)))
+      .map(rootId=>({rootId,score:scoreRoot(rootId)}))
+      .sort((a,b)=>b.score-a.score);
+    return roots[0]?.rootId||null;
+  };
 
-  // PASS 200 FIX: เดิมบอทให้คะแนนทีละ "ขั้นเทค" แล้วเลือกขั้นที่คะแนนสูงสุดทุกรอบ
-  // ผลคือ RP กระจายไปเริ่มหลายสายพร้อมกัน (เพราะขั้นแรกของทุกสายราคาถูกและว่างพร้อมกันเสมอ)
-  // แต่ไม่เคยเก็บพอสำหรับขั้นถัดไปของสายเดิม จึงไม่มีบอทตัวไหนไปถึง Tier 3 ทัน 12 ไตรมาส
-  // ตอนนี้บอทจะ "เลือกสายเดียวไปจนสุด" แล้วเก็บ RP รอจ่ายขั้นถัดไปของสายนั้นแทนที่จะรีบใช้
-  if(!bot.v2CommittedChain || !V2_TECH_CHAINS[bot.v2CommittedChain]){
-    const roots=Object.keys(V2_TECH_CHAINS);
-    const scored=roots.map(rootId=>{
-      const finalUnit=unitOf(V2_TECH_CHAINS[rootId][V2_TECH_CHAINS[rootId].length-1]);
-      let score=Math.random()*3;
-      if(style==='research') score+=Number(finalUnit.tier||0)*20+Number(finalUnit.basePrice||0);
-      else if(style==='mass') score+=-Number(finalUnit.cpCost||1)*8;
-      else if(style==='premium') score+=Number(finalUnit.tier||0)*18+Number(finalUnit.basePrice||0)*1.5;
-      else score+=Number(finalUnit.tier||0)*8+Number(finalUnit.basePrice||0)*0.4;
-      return {rootId,score};
-    }).sort((a,b)=>b.score-a.score);
-    bot.v2CommittedChain=scored[0].rootId;
+  if(
+    !bot.v2CommittedChain ||
+    !V2_TECH_CHAINS[bot.v2CommittedChain] ||
+    !V2_TECH_CHAINS[bot.v2CommittedChain].some(id=>v2CanUnlock(id,bot))
+  ){
+    bot.v2CommittedChain=chooseRemainingChain();
   }
 
   const chain=V2_TECH_CHAINS[bot.v2CommittedChain]||[];
-  let guard=0;
-  while(guard++<4){
-    const nextId=chain.find(id=>v2CanUnlock(id,bot));
-    if(!nextId) break; // สายนี้ปลดล็อกครบทุกขั้นแล้ว
-    const cost=v2TechSpend(nextId,bot);
-    if(Number(bot.rp||0)<cost) break; // RP ยังไม่พอ เก็บสะสมไว้ก่อน ไม่ไปแตะสายอื่น
-    bot.rp-=cost; bot.v2Unlocked.push(nextId);
-  }
+  const nextId=chain.find(id=>v2CanUnlock(id,bot));
+  if(!nextId) return;
 
-  // ถ้าสายที่เลือกไว้จบครบ Tier 3 แล้วและยัง RP เหลือ ค่อยเปิดสายถัดไปเป็นโบนัส
-  if(chain.length && chain.every(id=>bot.v2Unlocked.includes(id))){
-    const otherRoots=Object.keys(V2_TECH_CHAINS).filter(id=>id!==bot.v2CommittedChain);
-    const startable=otherRoots.find(id=>Number(bot.rp||0)>=v2TechSpend(id,bot));
-    if(startable) bot.v2CommittedChain=startable;
-  }
+  const cost=v2TechSpend(nextId,bot);
+  if(Number(bot.rp||0)<cost) return; // เก็บ RP รอขั้นถัดไปของสายเดิม
+
+  // Expert ใช้กติกาเดียวกับผู้เล่น: ปลดล็อกได้สูงสุด 1 รุ่นต่อไตรมาส
+  bot.rp-=cost;
+  bot.v2Unlocked.push(nextId);
+}
+
+function v2ExpertChoosePlanet(bot,unit,production){
+  const qty=Math.max(0,Number(production||0));
+  const scored=V2_PLANETS.map(planet=>{
+    const demand=Number(v2DemandPercent(planet.id)||40);
+    const demandPriority=Number(v2DemandPriority(planet.id)||0);
+    const hint=v2HintFor(planet.id);
+    const newsPriority=(hint&&v2HintMatches(hint,unit))?Number(hint.level||0):0;
+    const transportTotal=Number(v2TransportCost(bot,planet.id,qty)||0);
+    const transportPerUnit=qty>0?transportTotal/qty:0;
+    // Demand เป็นปัจจัยหลัก ข่าวที่ตรงรุ่นมีน้ำหนักสูง และค่าขนส่งหักคะแนนต่อเครื่อง
+    const score=(demand/10)+(demandPriority*1.5)+(newsPriority*3)-(transportPerUnit*1.25)+(Math.random()*0.35);
+    return {planetId:planet.id,score};
+  });
+  scored.sort((a,b)=>b.score-a.score);
+  return scored[0]?.planetId||bot.homePlanet||V2_PLANETS[0].id;
 }
 
 function v2AutoDecision(bot){
@@ -8743,8 +8348,8 @@ function v2AutoDecision(bot){
   }
 
   if(unit.id==='eya-01') d.quality=Math.max(70,Number(d.quality||70));
-  const location=V2_PLANETS[Math.floor(Math.random()*V2_PLANETS.length)].id;
   const production=Math.max(0,Math.floor((Number(bot.capacity||0)*Number(d.prodPct||0)/100)/Math.max(1,Number(unit.cpCost||1))));
+  const location=expert?v2ExpertChoosePlanet(bot,unit,production):V2_PLANETS[Math.floor(Math.random()*V2_PLANETS.length)].id;
   return {...d,unitId:unit.id,production,location,rndInvest:0};
 }
 
@@ -8809,10 +8414,17 @@ function v2DebtCardHTML(player=me()){
         ? `มีหนี้คงค้าง ${fmt(debt)} Cr. ต้องชำระเต็มจำนวนก่อนจึงจะกู้ใหม่ได้`
         : `ไม่มีหนี้ สามารถกู้ได้เมื่อเงินไม่พอทำคำสั่ง`}
     </div>
-    <div class="v2-debt-actions">
-      <span>เงินสดปัจจุบัน ${fmt(player?.funds||0)} Cr.</span>
-      <button id="repayDebt" class="mini-btn primary" ${canRepay?'':'disabled'}>ชำระหนี้ทั้งหมด</button>
-    </div>
+    ${debt>0 ? `<div class="v2-debt-actions">
+      <div class="v2-debt-cash">
+        <span>เงินสดปัจจุบัน</span>
+        <b>${fmt(player?.funds||0)} Cr.</b>
+      </div>
+      <button id="repayDebt" class="v2-repay-all-btn" ${canRepay?'':'disabled'}>
+        <span>ชำระหนี้ทั้งหมด</span>
+        <small>${fmt(debt)} Cr.</small>
+      </button>
+      ${canRepay ? '' : `<div style="text-align:center;color:var(--red);font-size:8.5px">เงินสดไม่เพียงพอสำหรับชำระเต็มจำนวน</div>`}
+    </div>` : ''}
   </div>`;
 }
 
@@ -8847,24 +8459,38 @@ function v2RepayDebt(player){
   return debt;
 }
 
-function v2BankruptcyFinalScore(player){
+function v2ScoreParts(player){
   const p=player||{};
   const unlocked=v2Unlocked(p);
-  const tier3=['salami','new-rx','gbaley','magz'].filter(id=>unlocked.has(id)).length;
-  const complete=V2_BRANCHES.every(br=>br.ids.some(id=>unlocked.has(id)));
-  const baseBonus=[0,50,150,300][Math.min(3,(p.bases||[]).length)]||0;
-  const tierBonus=[0,100,250,450,650][tier3]||0;
-  const completeBonus=complete?200:0;
-  const debt=Number(p.regularDebt||0);
-  return Number(p.funds||0)
-    + Number(p.reputation||0)*20
-    + Number(p.capacity||0)*(GameData.EXPANSION_COST_PER_UNIT*.5)
-    + unlocked.size*40
-    + Number(p.rp||0)*.5
-    + baseBonus
-    + tierBonus
-    + completeBonus
-    - debt;
+  const hasTier3=GameData.UNIT_TYPES.some(u=>Number(u.tier||0)===3 && unlocked.has(u.id));
+  const complete=V2_BRANCHES.every(br=>br.ids.every(id=>unlocked.has(id)));
+  const baseCount=new Set(p.bases||[]).size;
+  const debt=Math.max(0,Number(p.regularDebt||p.debt||0));
+  return {
+    cash:Number(p.funds||0)*0.5,
+    rep:Number(p.reputation||0)*1.5,
+    factory:Number(p.capacity||0)*2,
+    tech:unlocked.size*20,
+    rp:Number(p.rp||0)*0.5,
+    baseBonus:baseCount*20,
+    tierBonus:hasTier3?20:0,
+    completeBonus:complete?20:0,
+    debt
+  };
+}
+function v2ScoreTotal(parts){
+  return Number(parts.cash||0)
+    + Number(parts.rep||0)
+    + Number(parts.factory||0)
+    + Number(parts.tech||0)
+    + Number(parts.rp||0)
+    + Number(parts.baseBonus||0)
+    + Number(parts.tierBonus||0)
+    + Number(parts.completeBonus||0)
+    - Number(parts.debt||0);
+}
+function v2BankruptcyFinalScore(player){
+  return v2ScoreTotal(v2ScoreParts(player));
 }
 
 submitRound = async function(){
@@ -8899,15 +8525,9 @@ submitRound = async function(){
     c=currentCalc();
     ship=v2TransportCost(p,d.location,c.prod);
     need=Math.ceil(c.estimatedTotal+ship);
-    if(!(await v2MaybeLoan(p,need))){
-      await v2ShowModal({
-        tone:'red',
-        title:'ยกเลิกคำสั่ง',
-        message:'เงินทุนไม่เพียงพอสำหรับดำเนินคำสั่งนี้',
-        confirmText:'รับทราบ'
-      });
-      return;
-    }
+    // PASS 209: ไม่เสนอเงินกู้ก่อนยืนยันคำสั่ง
+    // ระบบจะคำนวณยอดขาย ต้นทุน ค่าขนส่ง และดอกเบี้ยให้เสร็จก่อน
+    // หากเงินสดติดลบ จะเสนอเงินกู้ในหน้า Brief ของไตรมาสถัดไป
   }
 
   const allSubs={};
@@ -8935,7 +8555,7 @@ submitRound = async function(){
     const unitGlobalBonus=Number(state.currentEvent?.v2UnitPriority?.[unit.id]||0);
     const tierGlobalBonus=Number(state.currentEvent?.v2TierPriority?.[Number(unit.tier)]||0);
     const globalBonus=unitGlobalBonus+tierGlobalBonus;
-    const secretBonus=unit.id==='eya-01'?20:0;
+    const secretBonus=0;
     const priorityBonus=demandBonus+newsBonus+globalBonus+secretBonus;
 
     return {
@@ -8953,14 +8573,14 @@ submitRound = async function(){
   });
 
   // ขั้นที่สอง: คำนวณค่าเฉลี่ย Demand ของดาวที่ทุกบริษัทเลือก
-  // ต่ำกว่า 50% = ×0.90 / 50–74% = ×1.25 / 75% ขึ้นไป = ×1.50
+  // ต่ำกว่า 50% = ×0.90 / 50–74% = ×1.50 / 75% ขึ้นไป = ×1.75
 
   const allPlanetMultipliers=Object.values(allSubs).map(sub=>{
     const demand=v2DemandPercent(sub.location);
 
     if(demand < 50) return 0.90;
-    if(demand < 75) return 1.25;
-    return 1.50;
+    if(demand < 75) return 1.50;
+    return 1.75;
   });
 
   const averagePlanetPoolMult=
@@ -9001,11 +8621,20 @@ submitRound = async function(){
     r.profitShareScore=Math.max(0,Number(r.revenue||0));
   });
 
-  const averageRevenueShare=1/Math.max(1,realResults.length);
+  const topUnitsSold=galacticUnitsSold>0
+    ? Math.max(...realResults.map(r=>Math.max(0,Number(r.unitsSold||0))))
+    : 0;
+  const topRevenue=galacticRevenue>0
+    ? Math.max(...realResults.map(r=>Math.max(0,Number(r.revenue||0))))
+    : 0;
   realResults.forEach(r=>{
-    const competitiveRep=Math.max(0,clamp((Number(r.profitShare||0)-averageRevenueShare)*8,-2,4));
+    const marketLeaderRep=galacticUnitsSold>0 && Math.max(0,Number(r.unitsSold||0))===topUnitsSold ? 1 : 0;
+    const revenueLeaderRep=galacticRevenue>0 && Math.abs(Math.max(0,Number(r.revenue||0))-topRevenue)<1e-9 ? 1 : 0;
+    const competitiveRep=marketLeaderRep+revenueLeaderRep;
     const adRepBonus=Math.min(4,clamp(Number(r.sub?.lobby||0),0,100)/25);
     const performanceBonus=r.perfTriggered?1.5:0;
+    r.marketLeaderRep=marketLeaderRep;
+    r.revenueLeaderRep=revenueLeaderRep;
     r.profitPerformanceRep=competitiveRep;
     r.repDelta=competitiveRep+Number(state.currentEvent?.repAll||0)+performanceBonus+adRepBonus;
   });
@@ -9019,7 +8648,7 @@ submitRound = async function(){
 
   const topSeller=[...realResults].sort((a,b)=>b.unitsSold-a.unitsSold)[0];
 
-  if(topSeller && Number(state.currentEvent?.v2TopSellerRep)){
+  if(topSeller && Number(topSeller.unitsSold||0)>0 && Number(state.currentEvent?.v2TopSellerRep)){
     topSeller.repDelta=Number(topSeller.repDelta||0)+Number(state.currentEvent.v2TopSellerRep);
   }
 
@@ -9033,9 +8662,11 @@ submitRound = async function(){
       : 0;
 
     planetTopIds[planet.id]=new Set(
-      sellers
-        .filter(r=>Number(r.unitsSold||0)===maxUnits)
-        .map(r=>r.player.id)
+      maxUnits>0
+        ? sellers
+            .filter(r=>Number(r.unitsSold||0)===maxUnits)
+            .map(r=>r.player.id)
+        : []
     );
   });
 
@@ -9078,23 +8709,23 @@ submitRound = async function(){
       };
     }
 
-    if(
-      pl.id==='you' &&
-      bankruptcyStreak>=2
-    ){
-      state.screen='bankrupt';
+    if(bankruptcyStreak>=2){
       const frozenScore=v2BankruptcyFinalScore({...pl,funds});
       pl.eliminated=true;
       pl.bankruptRound=state.round;
       pl.frozenScore=frozenScore;
-      state.bankruptcy={
-        interest,
-        cash:funds,
-        debt:Number(pl.regularDebt||0),
-        finalScore:frozenScore,
-        round:state.round,
-        reason:'ขาดสภาพคล่องติดต่อกัน 2 ไตรมาส'
-      };
+
+      if(pl.id==='you'){
+        state.screen='bankrupt';
+        state.bankruptcy={
+          interest,
+          cash:funds,
+          debt:Number(pl.regularDebt||0),
+          finalScore:frozenScore,
+          round:state.round,
+          reason:'ขาดสภาพคล่องติดต่อกัน 2 ไตรมาส'
+        };
+      }
     }
 
     let repDelta=r.repDelta||0;
@@ -9102,6 +8733,8 @@ submitRound = async function(){
     const newCapacity=Math.min(GameData.MAX_CAPACITY,Math.max(1,(pl.capacity||27)+Math.round((r.sub.factoryInvest||0)/GameData.EXPANSION_COST_PER_UNIT)));
     const updated={...pl,
       inventory:r.endingInventory||{},
+      pilotFreeBaseUses:0,
+      pilotFreeBaseRound:0,
       funds:Math.round(funds),
       bankruptcyStreak,
       debt:Number(pl.regularDebt||0),
@@ -9110,7 +8743,7 @@ submitRound = async function(){
     return updated;
   });
 
-  const mapped=realResults.map(r=>({playerId:r.player.id,name:r.player.name,unit:r.unit,quality:Number(r.sub?.quality||0),unitPrice:Number(r.econ?.unitPrice||0),advertising:Number(r.sub?.lobby||0),priceStrategy:Number(r.sub?.priceStrategy||0),share:r.share,profitShare:r.profitShare,profitShareScore:r.profitShareScore,grossProductProfit:r.grossProductProfit,cogs:r.cogs,referencePrice:r.referencePrice,priceRatio:r.priceRatio,priceAppeal:r.priceAppeal,purchaseAcceptance:r.purchaseAcceptance,production:Number(r.sub?.production||0),unitsSold:r.unitsSold,fromStock:r.fromStock,availableUnits:r.availableUnits,transportDamagePct:Number(r.transportDamagePct||0),transportLoss:Number(r.transportLoss||0),freshDeliverable:Number(r.freshDeliverable||0),leftoverFresh:r.leftoverFresh,inventoryQty:r.inventoryQty,inventoryCost:r.inventoryCost,revenue:r.revenue,cost:Number(r.cost||0)+Number(r.transportCost||0),profit:r.profit,profitPerformanceRep:r.profitPerformanceRep||0,repDelta:r.repDelta||0,location:r.location,transportCost:r.transportCost||0,planetDemandBonus:r.planetDemandBonus||0,planetDemandPercent:r.planetDemandPercent||40,planetNewsBonus:r.planetNewsBonus||0}));
+  const mapped=realResults.map(r=>({playerId:r.player.id,name:r.player.name,unit:r.unit,quality:Number(r.sub?.quality||0),unitPrice:Number(r.econ?.unitPrice||0),advertising:Number(r.sub?.lobby||0),priceStrategy:Number(r.sub?.priceStrategy||0),share:r.share,profitShare:r.profitShare,profitShareScore:r.profitShareScore,grossProductProfit:r.grossProductProfit,cogs:r.cogs,referencePrice:r.referencePrice,priceRatio:r.priceRatio,priceAppeal:r.priceAppeal,purchaseAcceptance:r.purchaseAcceptance,production:Number(r.sub?.production||0),unitsSold:r.unitsSold,fromStock:r.fromStock,availableUnits:r.availableUnits,transportDamagePct:Number(r.transportDamagePct||0),transportLoss:Number(r.transportLoss||0),freshDeliverable:Number(r.freshDeliverable||0),leftoverFresh:r.leftoverFresh,inventoryQty:r.inventoryQty,inventoryCost:r.inventoryCost,revenue:r.revenue,cost:Number(r.cost||0)+Number(r.transportCost||0),profit:r.profit,marketLeaderRep:r.marketLeaderRep||0,revenueLeaderRep:r.revenueLeaderRep||0,profitPerformanceRep:r.profitPerformanceRep||0,repDelta:r.repDelta||0,location:r.location,transportCost:r.transportCost||0,planetDemandBonus:r.planetDemandBonus||0,planetDemandPercent:r.planetDemandPercent||40,planetNewsBonus:r.planetNewsBonus||0}));
   const youResult=mapped.find(x=>x.playerId==='you');
   if(youResult && Number(youResult.unitsSold||0)>0 &&
      !me().v2SpecialRevealed &&
@@ -9123,24 +8756,90 @@ submitRound = async function(){
   save();
   render();
 
-  // PASS 126: แสดงคำเตือนหลังหน้า Result ถูกวาดเสร็จ
-  if(state.financialWarning){
-    const warning={...state.financialWarning};
+  // PASS 209: เก็บสถานะเงินติดลบไว้ และเสนอเงินกู้เมื่อเข้าสู่ Brief รอบถัดไป
+  // ไม่แสดง Popup กู้เงินหรือคำเตือนบนหน้า Report
+};
+
+
+async function v2HandleBriefNegativeCash(){
+  const player=me();
+  const warning=state.financialWarning;
+  if(!warning || !player || state.phase!=='briefing' || Number(player.funds||0)>=0){
+    if(warning && Number(player?.funds||0)>=0){
+      state.financialWarning=null;
+      save();
+    }
+    return;
+  }
+
+  const cash=Math.round(Number(player.funds||0));
+  const existingDebt=Math.max(0,Number(player.regularDebt||0));
+
+  // มีหนี้เดิมอยู่แล้ว จะกู้ซ้ำไม่ได้ตามกติกา Single Reusable Loan
+  if(existingDebt>0){
     state.financialWarning=null;
     save();
-
     await v2ShowModal({
       tone:'red',
       icon:'⚠️',
       title:'สถานะการเงินเสี่ยงล้มละลาย',
-      message:'หลังจากสรุปผลการขายและหักดอกเบี้ยแล้ว บริษัทของคุณมีเงินคงเหลือติดลบ',
-      detail:'หากเงินคงเหลือติดลบหลังจบไตรมาสติดต่อกันอีก 1 ครั้ง บริษัทจะออกจากตลาดทันที',
+      message:`ยอดเงินหลังสรุปผลอยู่ที่ ${fmt(cash)} Cr.`,
+      detail:`คุณมีหนี้คงค้าง ${fmt(existingDebt)} Cr. จึงยังไม่สามารถกู้ครั้งใหม่ได้`,
+      warning:'หากเงินยังติดลบหลังจบไตรมาสนี้ บริษัทจะออกจากตลาด',
       confirmText:'รับทราบ'
     });
+    return;
   }
-};
 
-nextQuarter = function(){
+  const amount=Math.max(0,Number(v2LoanOffer(player)||0));
+  const accepted=await v2ShowModal({
+    tone:'gold',
+    title:'วงเงินกู้เพื่อธุรกิจ',
+    icon:'🏦',
+    message:`หลังคำนวณยอดขายและหักดอกเบี้ยแล้ว เงินสดติดลบ ${fmt(Math.abs(cash))} Cr.`,
+    detail:`ธนาคารเสนอวงเงิน ${fmt(amount)} Cr.\nดอกเบี้ย 8% ต่อไตรมาส`,
+    warning:'ต้องชำระหนี้เต็มจำนวนก่อน จึงจะกู้ครั้งใหม่ได้',
+    confirmText:'รับเงินกู้',
+    cancelText:'ยังก่อน'
+  });
+
+  state.financialWarning=null;
+
+  if(accepted && amount>0){
+    player.funds=Math.round(Number(player.funds||0)+amount);
+    player.regularDebt=amount;
+    player.emergencyDebt=0;
+    player.debt=amount;
+    save();
+    render();
+
+    await v2ShowModal({
+      tone:Number(player.funds||0)>=0?'blue':'red',
+      icon:'🏦',
+      title:'รับเงินกู้แล้ว',
+      message:`ได้รับเงินกู้ ${fmt(amount)} Cr.`,
+      detail:`เงินสดปัจจุบัน ${fmt(player.funds||0)} Cr.\nหนี้คงค้าง ${fmt(player.regularDebt||0)} Cr.`,
+      warning:Number(player.funds||0)<0
+        ? 'วงเงินยังไม่ครอบคลุมยอดติดลบ หากจบไตรมาสนี้แล้วยังติดลบ บริษัทจะออกจากตลาด'
+        : '',
+      confirmText:'รับทราบ'
+    });
+    return;
+  }
+
+  save();
+  await v2ShowModal({
+    tone:'red',
+    icon:'⚠️',
+    title:'ยังไม่ได้รับเงินกู้',
+    message:`เงินสดปัจจุบัน ${fmt(player.funds||0)} Cr.`,
+    detail:'คุณยังสามารถวางแผนไตรมาสนี้ต่อได้',
+    warning:'หากเงินยังติดลบหลังจบไตรมาสนี้ บริษัทจะออกจากตลาด',
+    confirmText:'รับทราบ'
+  });
+}
+
+nextQuarter = async function(){
   AudioEngine.sfx('next');
   if(state.round>=12){state.screen='end'; save(); render(); return;}
   state.round++;
@@ -9156,6 +8855,9 @@ nextQuarter = function(){
   PilotEventSystemV2.rollQuarter(true);
   save();
   render();
+
+  // PASS 210: Popup เงินกู้เกิดหลังเข้าสู่ Phase 1 — Brief ของไตรมาสถัดไป
+  await v2HandleBriefNegativeCash();
 };
 
 const _v1RenderReport=renderReport;
@@ -9181,15 +8883,8 @@ renderReport = function(){
 
 renderEnd = function(){
   const ranks=[...state.players].map(p=>{
-    const unlocked=v2Unlocked(p);
-    const tier3=['salami','new-rx','gbaley','magz'].filter(id=>unlocked.has(id)).length;
-    const complete=V2_BRANCHES.every(br=>br.ids.some(id=>unlocked.has(id)));
-    const baseBonus=[0,50,150,300][Math.min(3,(p.bases||[]).length)]||0;
-    const tierBonus=[0,100,250,450,650][tier3]||0;
-    const completeBonus=complete?200:0;
-    const debt=Number(p.regularDebt||0);
-    const parts={cash:p.funds,rep:p.reputation*20,factory:p.capacity*(GameData.EXPANSION_COST_PER_UNIT*.5),tech:[...unlocked].length*40,rp:(p.rp||0)*.5,baseBonus,tierBonus,completeBonus,debt};
-    const liveScore=Object.values(parts).slice(0,-1).reduce((a,b)=>a+b,0)-debt;
+    const parts=v2ScoreParts(p);
+    const liveScore=v2ScoreTotal(parts);
     return {
       ...p,
       parts,
@@ -9199,7 +8894,7 @@ renderEnd = function(){
     };
   }).sort((a,b)=>b.score-a.score);
   app.innerHTML=`<main class="phone end-phone">${topHTML()}<section class="pages"><div class="page end-page"><div class="page-body"><div class="card news"><div class="section-title"><span class="text">Final Ranking</span><span class="badge">END</span></div><div class="news-lines" style="padding:var(--sp-2) var(--sp-3) var(--sp-3)">${ranks.map((p,i)=>`<div class="news-line"><b>#${i+1} ${esc(p.name)}</b> · Score ${fmt(Math.round(p.score))}${p.eliminated?` · <span class="red">ออกจากตลาด Q${p.bankruptRound||'?'}</span>`:''}</div>`).join('')}</div></div>${ranks.filter(p=>p.id==='you').map(p=>`<div class="card news"><div class="section-title"><span class="text">คะแนนของคุณมาจาก</span></div><div class="news-lines" style="padding:var(--sp-2) var(--sp-3) var(--sp-3)">
-    <div class="news-line">เงินสด +${fmt(p.parts.cash)}</div><div class="news-line">Brand +${fmt(p.parts.rep)}</div><div class="news-line">โรงงาน +${fmt(p.parts.factory)}</div><div class="news-line">Tech Tree +${fmt(p.parts.tech)}</div><div class="news-line">Research Point เหลือ +${fmt(p.parts.rp)}</div><div class="news-line">โบนัสฐาน +${fmt(p.parts.baseBonus)}</div><div class="news-line">โบนัส Tier 3 +${fmt(p.parts.tierBonus)}</div><div class="news-line">โบนัสครบทุกสาย +${fmt(p.parts.completeBonus)}</div><div class="news-line red">หนี้ −${fmt(p.parts.debt)}</div>
+    <div class="news-line">เงินสด ×0.5 +${fmt(p.parts.cash)}</div><div class="news-line">Brand ×1.5 +${fmt(p.parts.rep)}</div><div class="news-line">Capacity ×2 +${fmt(p.parts.factory)}</div><div class="news-line">หุ่นที่ปลดล็อก ตัวละ 20 +${fmt(p.parts.tech)}</div><div class="news-line">Research Point เหลือ ×0.5 +${fmt(p.parts.rp)}</div><div class="news-line">ฐาน Logistics แห่งละ 20 +${fmt(p.parts.baseBonus)}</div><div class="news-line">มีหุ่น Tier 3 อย่างน้อย 1 ตัว +${fmt(p.parts.tierBonus)}</div><div class="news-line">ปลดครบทุกสาย Tech +${fmt(p.parts.completeBonus)}</div><div class="news-line red">หนี้ −${fmt(p.parts.debt)}</div>
   </div></div>`).join('')}</div><div class="actions single"><button id="resetGame" class="btn btn-primary">เริ่มเกมใหม่</button></div></div></section></main>`; bindCommon();
 };
 
@@ -9297,18 +8992,18 @@ bindCommon = function(){
     const p=me();
     const unlockedBeforePull=v2Unlocked(p);
     const availableBeforePull=GameData.UNIT_TYPES.filter(u=>u.id!=='ball-kai' && !unlockedBeforePull.has(u.id));
-    if(Number(state.round||1)<7 || Number(p.funds||0)<200 || !availableBeforePull.length){AudioEngine.sfx('error');return;}
+    if(Number(state.round||1)<7 || Number(p.funds||0)<V2_GACHA_COST || !availableBeforePull.length){AudioEngine.sfx('error');return;}
     const ok=await v2ShowModal({
       tone:'gold',
       title:'Galactic Gacha',
-      message:'ใช้ 150 Cr เพื่อสุ่มพิมพ์เขียน 1 ครั้งหรือไม่?',
+      message:`ใช้ ${V2_GACHA_COST} Cr. เพื่อสุ่มหุ่น 1 ครั้งหรือไม่?`,
       detail:'ระบบจะสุ่มเฉพาะหุ่นที่คุณยังไม่มี',
       warning:'ไม่มีการคืนเงินหลังยืนยันการสุ่ม',
       confirmText:'สุ่มเลย',
       cancelText:'ยังก่อน'
     });
     if(!ok) return;
-    p.funds-=150;
+    p.funds-=V2_GACHA_COST;
     p.v2GachaPulls=Number(p.v2GachaPulls||0)+1;
     const machine=document.querySelector('.v2-gacha-machine');
     const win=document.querySelector('.v2-gacha-window');
@@ -9333,7 +9028,7 @@ bindCommon = function(){
       u=v2Unit('eya-01');
     }
     if(!u){
-      p.funds+=200;
+      p.funds+=V2_GACHA_COST;
       AudioEngine.sfx('error');
       save();
       render();
@@ -9402,7 +9097,8 @@ bindCommon = function(){
 
     const selection=document.querySelector('#baseChoiceSelection');
     if(selection){
-      selection.innerHTML=`ฐานใหม่: <b>${esc(v2Planet(selectedBasePlanetId).name)}</b> · ค่าใช้จ่าย 100 Cr.`;
+      const isFree=v2FreePilotBaseUses(me(),state.round)>0;
+      selection.innerHTML=`ฐานใหม่: <b>${esc(v2Planet(selectedBasePlanetId).name)}</b> · ${isFree?'ฟรีจากกองกำลังเด็กกำพร้า':'ค่าใช้จ่าย 100 Cr.'}`;
     }
 
     const confirmBtn=document.querySelector('#confirmBaseBuild');
@@ -9431,7 +9127,9 @@ bindCommon = function(){
       return;
     }
 
-    if(v2AvailableBaseSlot(p)<=0 || Number(p.baseSlotReadyRound||0)>state.round){
+    const freePilotBase=v2FreePilotBaseUses(p,state.round)>0;
+    const normalBaseReady=v2AvailableBaseSlot(p)>0 && Number(p.baseSlotReadyRound||0)<=state.round;
+    if(!freePilotBase && !normalBaseReady){
       await v2ShowModal({
         tone:'blue',
         title:'ยังตั้งฐานไม่ได้',
@@ -9457,14 +9155,14 @@ bindCommon = function(){
       return;
     }
 
-    if((p.funds||0)<BASE_BUILD_COST){
+    if(!freePilotBase && (p.funds||0)<BASE_BUILD_COST){
       const loanAccepted=await v2MaybeLoan(p,BASE_BUILD_COST);
 
       if(!loanAccepted){
         return;
       }
 
-      if((p.funds||0)<BASE_BUILD_COST){
+      if(!freePilotBase && (p.funds||0)<BASE_BUILD_COST){
         await v2ShowModal({
           tone:'red',
           title:'วงเงินไม่เพียงพอ',
@@ -9476,8 +9174,12 @@ bindCommon = function(){
       }
     }
 
-    p.funds-=BASE_BUILD_COST;
-    p.baseBuilds.push({planetId:pid,completeRound:state.round+1});
+    if(freePilotBase){
+      p.pilotFreeBaseUses=Math.max(0,Number(p.pilotFreeBaseUses||0)-1);
+    }else{
+      p.funds-=BASE_BUILD_COST;
+    }
+    p.baseBuilds.push({planetId:pid,completeRound:state.round+1,source:freePilotBase?'orphan-force':'normal'});
     p.baseChoiceDeferredRound=0;
     AudioEngine.sfx('select');
     save();
@@ -11744,7 +11446,7 @@ body::before{
         &lt;div class=&quot;command&quot;&gt;&lt;div class=&quot;command-icon&quot;&gt;₵&lt;/div&gt;&lt;b&gt;ราคา&lt;/b&gt;&lt;p&gt;ราคาสูงทำกำไรต่อเครื่องมากขึ้น แต่ลูกค้าอาจเปลี่ยนไปซื้อคู่แข่ง&lt;/p&gt;&lt;/div&gt;
         &lt;div class=&quot;command&quot;&gt;&lt;div class=&quot;command-icon&quot;&gt;▦&lt;/div&gt;&lt;b&gt;การผลิต&lt;/b&gt;&lt;p&gt;ผลิตมากมีโอกาสทำกำไรมาก แต่ถ้าเกินตลาดจะกลายเป็นสต็อก&lt;/p&gt;&lt;/div&gt;
         &lt;div class=&quot;command&quot;&gt;&lt;div class=&quot;command-icon&quot;&gt;◖&lt;/div&gt;&lt;b&gt;โฆษณา&lt;/b&gt;&lt;p&gt;ช่วยให้สินค้าของคุณเป็นที่สนใจและได้รับการรับรู้มากขึ้น&lt;/p&gt;&lt;/div&gt;
-        &lt;div class=&quot;command&quot;&gt;&lt;div class=&quot;command-icon&quot;&gt;▥&lt;/div&gt;&lt;b&gt;โรงงาน&lt;/b&gt;&lt;p&gt;เพิ่มกำลังการผลิต และเพิ่มสิทธิ์ขยายสายการผลิตไปยังดาวอื่น&lt;/p&gt;&lt;/div&gt;
+        &lt;div class=&quot;command&quot;&gt;&lt;div class=&quot;command-icon&quot;&gt;▥&lt;/div&gt;&lt;b&gt;โรงงาน&lt;/b&gt;&lt;p&gt;เพิ่มกำลังการผลิต และปลดสิทธิ์ตั้งฐาน Logistics เพื่อลดค่าขนส่ง โดยฐานไม่เพิ่ม Capacity หรือ CP&lt;/p&gt;&lt;/div&gt;
       &lt;/div&gt;
     &lt;/section&gt;
 
@@ -11752,7 +11454,7 @@ body::before{
       &lt;div class=&quot;section-head&quot;&gt;&lt;div class=&quot;num&quot;&gt;5&lt;/div&gt;&lt;div&gt;&lt;div class=&quot;section-title&quot;&gt;วิธีเล่นให้รอด&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;
       &lt;div class=&quot;win-grid&quot;&gt;
         &lt;div class=&quot;win&quot;&gt;&lt;b&gt;อย่าดูแค่ราคาขาย&lt;/b&gt;กำไรต่อเครื่องสูง ไม่ได้แปลว่าจะขายได้มาก&lt;/div&gt;
-        &lt;div class=&quot;win&quot;&gt;&lt;b&gt;กระจายฐานการผลิต&lt;/b&gt;ฐานในดาวนั้นช่วยลดค่าขนส่ง&lt;/div&gt;
+        &lt;div class=&quot;win&quot;&gt;&lt;b&gt;กระจายฐาน Logistics&lt;/b&gt;ฐานในดาวนั้นช่วยลดค่าขนส่ง&lt;/div&gt;
         &lt;div class=&quot;win&quot;&gt;&lt;b&gt;บริหารหนี้&lt;/b&gt;อย่าปล่อยกระแสเงินสดติดลบต่อเนื่อง&lt;/div&gt;
         &lt;div class=&quot;win&quot;&gt;&lt;b&gt;เปลี่ยนแผนตามตลาด&lt;/b&gt;ไม่มีหุ่นรุ่นเดียวที่ดีที่สุดทุกไตรมาส&lt;/div&gt;
       &lt;/div&gt;
