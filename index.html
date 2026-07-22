@@ -1,3 +1,8 @@
+<!-- PASS 221: LOWER BGM AGAIN
+- ลด BGM ลงอีก 50%
+- musicGain จาก 0.19 เหลือ 0.095
+- คง SFX, crossfade และระบบเกมทั้งหมด
+-->
 <!-- PASS 220: LOWER BGM / NO DUCKING
 - นำระบบลดเสียงเพลงชั่วคราวเมื่อมี SFX ออกทั้งหมด
 - ลด BGM จาก 0.38 เหลือ 0.19
@@ -5459,7 +5464,7 @@ const AudioEngine=(()=>{
       musicGain=ctx.createGain();
       sfxGain=ctx.createGain();
       master.gain.value=enabled?0.82:0;
-      musicGain.gain.value=0.19;
+      musicGain.gain.value=0.095;
       sfxGain.gain.value=1.00;
       musicGain.connect(master);
       sfxGain.connect(master);
