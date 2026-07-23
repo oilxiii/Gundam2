@@ -1,26 +1,8 @@
-<!-- PASS 221: LOWER BGM AGAIN
-- ลด BGM ลงอีก 50%
-- musicGain จาก 0.19 เหลือ 0.095
-- คง SFX, crossfade และระบบเกมทั้งหมด
--->
-<!-- PASS 220: LOWER BGM / NO DUCKING
-- นำระบบลดเสียงเพลงชั่วคราวเมื่อมี SFX ออกทั้งหมด
-- ลด BGM จาก 0.38 เหลือ 0.19
-- คงระดับ SFX ที่ 1.00
-- คงระบบ crossfade 1:45 → 0:25 และระบบเกมเดิม
--->
-<!-- PASS 219: CROSSFADE BGM + SFX MIX FIX
-- ลดระดับเพลงพื้นหลังเพื่อเว้นพื้นที่ให้เสียงเอฟเฟกต์
-- เพิ่มระดับ SFX และเพิ่ม music ducking ชั่วคราวเมื่อเอฟเฟกต์ดัง
-- เพิ่มเสียง success ที่เคยถูกเรียกใช้แต่ไม่มี case รองรับ
-- คงระบบ crossfade 1:45 → 0:25 และระบบเกม PASS 217 เดิม
--->
-<!-- PASS 218: FINAL CROSSFADE BGM
-- แทนที่เพลง 8-bit เดิมด้วยเพลงเต็มที่ฝังในไฟล์
-- รอบแรกเล่น 0:00–1:46
-- ช่วง 1:45–1:46 crossfade เข้าสู่ 0:25–0:26
-- รอบถัดไปวนช่วง 0:25–1:46 ด้วย crossfade 1 วินาที
-- คงเสียง SFX และปุ่มเปิด/ปิดเสียงเดิมทั้งหมด
+<!-- PASS 222: EXPERT AI + CROSSFADE BGM 0.04
+- คงระบบ Expert AI เวอร์ชันใหม่จากไฟล์ต้นฉบับทั้งหมด
+- เปลี่ยนเพลงเดิมเป็น BGM แบบ intro 0:00–1:46 และ crossfade 1:45 → 0:25
+- ตั้งระดับ BGM ที่ 0.04
+- คง SFX ที่ 1.00 และไม่มีระบบลดเสียงเพลงชั่วคราวเมื่อมี SFX
 -->
 <!-- PASS 217: ELIMINATED AI MARKET REMOVAL
 - บริษัทที่ล้มละลายได้รับคำสั่งว่าง Production 0 และไม่เรียก Expert AI decision อีก
@@ -4506,7 +4488,67 @@ const BOT_NAMES = ['Anaheim', 'Zeonic', 'MIP Works', 'Luna Steel', 'Axis Dynamic
       priceStrategy = 104 + Math.random() * 18;
 
       let hardCandidates = null;
-      if (difficulty === 'hard') {
+      if (difficulty === 'expert') {
+        // Expert: กริดละเอียดกว่า Hard + หลีกเลี่ยงรุ่นที่คู่แข่งแย่งผลิตเยอะจากรายงานสาธารณะรอบก่อน
+        // (ข้อมูลเดียวกับที่ผู้เล่นเห็นได้ ไม่ใช่การรู้เกินผู้เล่น) + ทำ local refinement รอบราคาที่เลือก
+        const crowdCount = {};
+        publicRows.forEach(r => {
+          const uid = r.unit?.baseId || r.unit?.id;
+          if (uid) crowdCount[uid] = (crowdCount[uid] || 0) + 1;
+        });
+        const evalCombo = (u, q, ps) => {
+          const qualityFactor = qualityAppealFactor(q);
+          const estProd = Math.max(1, Math.round((cap * 0.9) / Math.max(1, u.cpCost || 1)));
+          const econEst = unitEconomics(q, ps, (event && event.costMult) || 1, 90, estProd, u.id, player);
+          const refPrice = marketReferencePrice(u);
+          const priceAppeal = priceAppealFromMarket(econEst.unitPrice, refPrice);
+          const acceptance = purchaseAcceptanceFromMarket(econEst.unitPrice, refPrice);
+          const priorityFactor = marketFamilyPriority(u) * marketVariantPriority(u);
+          const reputationFactor = 1 + (clamp(rep, 0, 100) / 100) * 0.50;
+          let competitiveness = priorityFactor * qualityFactor * priceAppeal * reputationFactor;
+          const crowd = crowdCount[u.id] || 0;
+          if (crowd >= 2) competitiveness *= Math.max(0.5, 1 - (crowd - 1) * 0.15);
+          // กำไรต่อหน่วยสูงไม่มีความหมายถ้าขายไม่ออก: ประเมินกำไรคาดหวังจาก "จำนวนที่น่าจะขายได้จริง"
+          // (production x โอกาสถูกรับซื้อ) ลบต้นทุนของเครื่องที่ผลิตเกินแล้วขายไม่ออก (ค้างสต๊อกเสียค่าธรรมเนียม)
+          const estSold = estProd * acceptance;
+          const estUnsold = estProd * (1 - acceptance);
+          const expectedProfit = estSold * econEst.margin - estUnsold * econEst.unitCost * 0.3;
+          return expectedProfit * Math.max(0.3, competitiveness);
+        };
+        const candidates = [];
+        available.forEach(u => {
+          [35, 45, 55, 65, 72, 80, 88, 95].forEach(q => {
+            [85, 95, 105, 115, 125, 135, 145].forEach(ps => {
+              candidates.push({ u, q, ps, score: evalCombo(u, q, ps) });
+            });
+          });
+        });
+        candidates.sort((a, b) => b.score - a.score);
+        hardCandidates = candidates;
+        const bestPerUnit = new Map();
+        candidates.forEach(c => {
+          const cur = bestPerUnit.get(c.u.id);
+          if (!cur || c.score > cur.score) bestPerUnit.set(c.u.id, c);
+        });
+        const unitPool = [...bestPerUnit.values()].sort((a, b) => b.score - a.score).slice(0, 3);
+        const weights = unitPool.map(c => Math.max(0.001, c.score));
+        const totalW = weights.reduce((s, w) => s + w, 0) || 1;
+        let roll = Math.random() * totalW;
+        let pick = unitPool[0];
+        for (let i = 0; i < unitPool.length; i++) { roll -= weights[i]; if (roll <= 0) { pick = unitPool[i]; break; } }
+        if (pick) {
+          // Local refinement: ขยับราคารอบจุดที่เลือกอีกละเอียด บีบผลลัพธ์ให้ดีกว่ากริดหยาบ
+          let best = pick;
+          [-8, -4, 4, 8].forEach(delta => {
+            const ps2 = clamp(pick.ps + delta, 50, 180);
+            const score2 = evalCombo(pick.u, pick.q, ps2);
+            if (score2 > best.score) best = { u: pick.u, q: pick.q, ps: ps2, score: score2 };
+          });
+          preferred = best.u.id;
+          quality = clamp(best.q + (Math.random() - 0.5) * 4, 12, 92);
+          priceStrategy = clamp(best.ps + (Math.random() - 0.5) * 5, 50, 180);
+        }
+      } else if (difficulty === 'hard') {
         // Hard ประเมินคู่ "คุณภาพ x ราคา" ของแต่ละรุ่นที่ปลดล็อกแล้ว โดยใช้สูตรตลาด
         // เดียวกับที่เกมใช้จริง (แรงดึงดูด + กำไรต่อหน่วย) — นี่คือการคำนวณกลยุทธ์
         // จากกติกาที่เปิดเผยอยู่แล้ว ไม่ใช่การรู้ข้อมูลเพิ่มเติมเหนือผู้เล่น
@@ -4550,6 +4592,29 @@ const BOT_NAMES = ['Anaheim', 'Zeonic', 'MIP Works', 'Luna Steel', 'Axis Dynamic
         }
       }
 
+      if (difficulty === 'expert' && publicRows.length) {
+        // ปรับราคาโดยอิงข้อมูลสาธารณะจาก Report รอบก่อน (รายงานเดียวกับที่ผู้เล่นเห็น)
+        // หมายเหตุ: ใช้ path ที่ตรงกับโครงสร้างจริงของ resolveRound (player.id / econ.unitPrice / sub.production)
+        const comparable = publicRows.filter(r => Number.isFinite(Number(r.econ?.unitPrice)));
+        if (comparable.length && preferred) {
+          const avgPrice = comparable.reduce((sum,r)=>sum+Number(r.econ.unitPrice),0)/comparable.length;
+          const targetUnit = available.find(u=>u.id===preferred) || available[0];
+          const estCost = unitEconomics(quality, 100, (event && event.costMult) || 1, 90, Math.max(1,Math.round(cap/Math.max(1,targetUnit.cpCost||1))), targetUnit.id, player).unitCost;
+          const inferred = clamp((avgPrice / Math.max(0.1, estCost)) * 100, 50, 180);
+          priceStrategy = clamp(priceStrategy * 0.78 + inferred * 0.22 - (2 + Math.random()*4), 50, 180);
+        }
+        const badOwn = publicRows.find(r=>r.player?.id===player.id && (r.unitsSold||0) < (r.sub?.production||0)*0.45);
+        if (badOwn && hardCandidates) {
+          // รอบก่อนพลาด: เปลี่ยนไปลองตัวเลือกที่ดีรองลงมาแทนที่จะย้ำแผนเดิม
+          const alt = hardCandidates.find(c => c.u.id !== preferred);
+          if (alt) {
+            preferred = alt.u.id;
+            quality = clamp(alt.q + (Math.random() - 0.5) * 6, 12, 92);
+            priceStrategy = clamp(alt.ps + (Math.random() - 0.5) * 8, 50, 180);
+          }
+        }
+      }
+
       if (difficulty === 'hard' && publicRows.length) {
         // ปรับราคาโดยอิงข้อมูลสาธารณะจาก Report รอบก่อน (รายงานเดียวกับที่ผู้เล่นเห็น)
         const comparable = publicRows.filter(r => Number.isFinite(Number(r.unitPrice)));
@@ -4572,28 +4637,28 @@ const BOT_NAMES = ['Anaheim', 'Zeonic', 'MIP Works', 'Luna Steel', 'Axis Dynamic
         }
       }
 
-      if (event && event.id === 'ace-pilot-trend' && event.rumorUnitId && Math.random() < (difficulty==='hard'?0.78:0.62)) {
+      if (event && event.id === 'ace-pilot-trend' && event.rumorUnitId && Math.random() < (difficulty==='expert'?0.85:difficulty==='hard'?0.78:0.62)) {
         const ids = new Set(available.map(u=>u.id));
         if (ids.has(event.rumorUnitId)) preferred = event.rumorUnitId;
         const target = unitToFocus(event.rumorUnitId);
-        priceStrategy = target.priceStrategy + (Math.random() - 0.5) * (difficulty==='hard'?10:20);
+        priceStrategy = target.priceStrategy + (Math.random() - 0.5) * (difficulty==='expert'?7:difficulty==='hard'?10:20);
       }
       if (!preferred) {
         const sorted = [...available].sort((a,b)=>{
           const score = (b.basePrice-b.baseCost)/(b.cpCost||1) - (a.basePrice-a.baseCost)/(a.cpCost||1);
-          return score + (Math.random()-0.5)*(difficulty==='hard'?0.6:2);
+          return score + (Math.random()-0.5)*(difficulty==='expert'?0.35:difficulty==='hard'?0.6:2);
         });
         preferred = (event && event.poolMult < 0.8) ? sorted.find(u=>u.cpCost<=2)?.id || sorted[0].id : sorted[0].id;
       }
-      if (event && event.costMult > 1.1) priceStrategy += (difficulty==='hard' ? 14 + Math.random()*2 : 8 + Math.random()*8);
-      if (event && event.poolMult < 0.8) priceStrategy -= (difficulty==='hard' ? 14 + Math.random()*2 : 8 + Math.random()*10);
+      if (event && event.costMult > 1.1) priceStrategy += (difficulty==='expert' ? 16+Math.random()*2 : difficulty==='hard' ? 14 + Math.random()*2 : 8 + Math.random()*8);
+      if (event && event.poolMult < 0.8) priceStrategy -= (difficulty==='expert' ? 16+Math.random()*2 : difficulty==='hard' ? 14 + Math.random()*2 : 8 + Math.random()*10);
       if (event && event.poolMult >= 1.2) quality += 5 + Math.random() * 8;
 
-      prodPct = difficulty==='hard' ? 84 + Math.random()*12 : 76 + Math.random()*24;
-      if (event && event.poolMult >= 1.2) prodPct += (difficulty==='hard' ? 18 + Math.random()*2 : 10 + Math.random()*12);
-      if (event && event.poolMult < 0.8) prodPct -= (difficulty==='hard' ? 24 + Math.random()*2 : 16 + Math.random()*10);
+      prodPct = difficulty==='expert' ? 88 + Math.random()*5 : difficulty==='hard' ? 84 + Math.random()*12 : 76 + Math.random()*24;
+      if (event && event.poolMult >= 1.2) prodPct += (difficulty==='expert' ? 19+Math.random()*2 : difficulty==='hard' ? 18 + Math.random()*2 : 10 + Math.random()*12);
+      if (event && event.poolMult < 0.8) prodPct -= (difficulty==='expert' ? 25+Math.random()*2 : difficulty==='hard' ? 24 + Math.random()*2 : 16 + Math.random()*10);
       if (event && event.damageChance) prodPct -= 5 + Math.random()*8;
-      if (invQty > cap * 0.25) prodPct -= difficulty==='hard'?18:10;
+      if (invQty > cap * 0.25) prodPct -= (difficulty==='expert'?20:difficulty==='hard'?18:10);
       if (cash < 260) prodPct -= 10;
     }
 
@@ -4623,12 +4688,14 @@ const BOT_NAMES = ['Anaheim', 'Zeonic', 'MIP Works', 'Luna Steel', 'Axis Dynamic
       ).unitCost;
       const ref = marketReferencePrice(unit);
       const targetActualPrice = ref * (
-        difficulty === 'hard'
+        difficulty === 'expert'
+          ? 0.97 + Math.random() * 0.11
+          : difficulty === 'hard'
           ? 0.92 + Math.random() * 0.16
           : 0.88 + Math.random() * 0.24
       );
       const targetStrategy = (targetActualPrice / Math.max(0.1, costAtBreakEven)) * 100;
-      priceStrategy = clamp(Math.max(80, targetStrategy), 50, difficulty === 'hard' ? 155 : 165);
+      priceStrategy = clamp(Math.max(80, targetStrategy), 50, difficulty === 'expert' ? 148 : difficulty === 'hard' ? 155 : 165);
     }
 
     priceStrategy = Math.round(clamp(priceStrategy, 50, 180));
@@ -4637,9 +4704,9 @@ const BOT_NAMES = ['Anaheim', 'Zeonic', 'MIP Works', 'Luna Steel', 'Axis Dynamic
     let production = Math.floor((cap * prodPct / 100) / Math.max(1, unit.cpCost || 1));
     let econ = unitEconomics(quality, priceStrategy, (event && event.costMult) || 1, prodPct, production, unit.id, player);
     let plannedCost = production * econ.unitCost;
-    const safeCashRatio = difficulty==='hard' ? 0.72 : difficulty==='easy' ? 0.95 : 0.78;
+    const safeCashRatio = (difficulty==='hard'||difficulty==='expert') ? 0.72 : difficulty==='easy' ? 0.95 : 0.78;
     if (plannedCost > cash * safeCashRatio && difficulty !== 'easy') {
-      const affordableUnits = Math.max(1, Math.floor((cash * (difficulty==='hard'?0.66:0.72)) / Math.max(1, econ.unitCost)));
+      const affordableUnits = Math.max(1, Math.floor((cash * ((difficulty==='hard'||difficulty==='expert')?0.66:0.72)) / Math.max(1, econ.unitCost)));
       const cpUse = affordableUnits * Math.max(1, unit.cpCost || 1);
       prodPct = Math.round(clamp((cpUse / cap) * 100, 25, 105));
       production = Math.floor((cap * prodPct / 100) / Math.max(1, unit.cpCost || 1));
@@ -4649,7 +4716,7 @@ const BOT_NAMES = ['Anaheim', 'Zeonic', 'MIP Works', 'Luna Steel', 'Axis Dynamic
 
     let lobby;
     if (difficulty === 'easy') lobby = Math.random()<0.35 ? 0 : Math.round(clamp(cash*(0.02+Math.random()*0.14),0,100));
-    else if (difficulty === 'hard') {
+    else if (difficulty === 'hard' || difficulty === 'expert') {
       const pressure = publicRows.length ? Math.max(...publicRows.map(r=>Number(r.advertising||0))) : 0;
       lobby = Math.round(clamp(Math.max(18, pressure*0.8, cash*(0.035+rep/7000)),0,Math.min(100,cash*0.14)));
     } else {
@@ -4664,10 +4731,10 @@ const BOT_NAMES = ['Anaheim', 'Zeonic', 'MIP Works', 'Luna Steel', 'Axis Dynamic
       if (next && spareCash>250 && Math.random()<0.30) rndInvest=Math.round(spareCash*0.06);
       if (spareCash>500 && Math.random()<0.22) factoryInvest=Math.round(spareCash*0.07);
     } else {
-      const rndRate = difficulty==='hard' ? (personality==='research'?0.18:0.11) : (personality==='research'?0.16:0.08);
-      if (next && spareCash > (difficulty==='hard'?120:180) && personality !== 'mass') rndInvest = Math.round(clamp(spareCash*rndRate,0,Math.min(difficulty==='hard'?160:140,spareCash*0.26)));
-      const factoryChance = difficulty==='hard' ? 0.52 : (personality==='mass'?0.58:0.34);
-      if (spareCash-rndInvest > (difficulty==='hard'?320:420) && cap < MAX_CAPACITY && Math.random()<factoryChance) factoryInvest=Math.round(clamp((spareCash-rndInvest)*(difficulty==='hard'?0.13:0.10),0,100));
+      const rndRate = (difficulty==='hard'||difficulty==='expert') ? (personality==='research'?0.18:0.11) : (personality==='research'?0.16:0.08);
+      if (next && spareCash > ((difficulty==='hard'||difficulty==='expert')?120:180) && personality !== 'mass') rndInvest = Math.round(clamp(spareCash*rndRate,0,Math.min((difficulty==='hard'||difficulty==='expert')?160:140,spareCash*0.26)));
+      const factoryChance = (difficulty==='hard'||difficulty==='expert') ? 0.52 : (personality==='mass'?0.58:0.34);
+      if (spareCash-rndInvest > ((difficulty==='hard'||difficulty==='expert')?320:420) && cap < MAX_CAPACITY && Math.random()<factoryChance) factoryInvest=Math.round(clamp((spareCash-rndInvest)*((difficulty==='hard'||difficulty==='expert')?0.13:0.10),0,100));
     }
     lobby = clamp(Number(lobby || 0), 0, 100);
     factoryInvest = clamp(Number(factoryInvest || 0), 0, 100);
@@ -5464,7 +5531,7 @@ const AudioEngine=(()=>{
       musicGain=ctx.createGain();
       sfxGain=ctx.createGain();
       master.gain.value=enabled?0.82:0;
-      musicGain.gain.value=0.095;
+      musicGain.gain.value=0.04;
       sfxGain.gain.value=1.00;
       musicGain.connect(master);
       sfxGain.connect(master);
